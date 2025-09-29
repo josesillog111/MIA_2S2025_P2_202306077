@@ -868,7 +868,7 @@ func (e *EXT2) Move(path string, dest string) error {
 }
 
 func (e *EXT2) Find(path string, name string) (string, error) {
-	return "", nil
+	return "no implementado", nil
 }
 
 func (e *EXT2) Chown(path string, user string, recursive bool) error {

@@ -62,6 +62,8 @@ P            : ('p' | 'P');
 
 ASSIGN              : '=' ;
 MINUS               : '-' ;
+STAR                : '*' ;
+QUESTION            : '?' ;
 ID                  : [_a-zA-Z0-9][_a-zA-Z0-9]* ;
 UNQUOTED_TEXT       : [a-zA-Z0-9_./\\:]+ ;
 LINE_COMMENT        : '#' ~[\r\n]* -> skip ;

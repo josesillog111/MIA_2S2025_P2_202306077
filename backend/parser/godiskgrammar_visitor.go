@@ -118,6 +118,9 @@ type GoDiskGrammarVisitor interface {
 	// Visit a parse tree produced by GoDiskGrammar#name.
 	VisitName(ctx *NameContext) interface{}
 
+	// Visit a parse tree produced by GoDiskGrammar#name_find.
+	VisitName_find(ctx *Name_findContext) interface{}
+
 	// Visit a parse tree produced by GoDiskGrammar#filen.
 	VisitFilen(ctx *FilenContext) interface{}
 

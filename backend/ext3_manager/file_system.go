@@ -848,46 +848,79 @@ func (e *EXT3) Mkdir(virtualPath string, p bool) error {
 }
 
 func (e *EXT3) Remove(path string) error {
+	fmt.Println("1) Remove: No implementado")
+	fmt.Println("path:", path)
+
 	return nil
 }
 
 func (e *EXT3) Edit(path string, contenido string) error {
+	fmt.Println("2) Edit: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("contenido:", contenido)
+
 	return nil
 }
 
 func (e *EXT3) Rename(path string, name string) error {
+	fmt.Println("3) Rename: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("name:", name)
+
 	return nil
 }
 
 func (e *EXT3) Copy(path string, dest string) error {
+	fmt.Println("4) Copy: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("dest:", dest)
 	return nil
 }
 
 func (e *EXT3) Move(path string, dest string) error {
+	fmt.Println("5) Move: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("dest:", dest)
 	return nil
 }
 
 func (e *EXT3) Find(path string, name string) (string, error) {
-	return "", nil
+	fmt.Println("6) Find: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("name:", name)
+	return "no implementado", nil
 }
 
 func (e *EXT3) Chown(path string, user string, recursive bool) error {
+	fmt.Println("7) Chown: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("user:", user)
+	fmt.Println("recursive:", recursive)
 	return nil
 }
 
 func (e *EXT3) Chmod(path string, ugo int64, recursive bool) error {
+	fmt.Println("8) Chmod: No implementado")
+	fmt.Println("path:", path)
+	fmt.Println("ugo:", ugo)
+	fmt.Println("recursive:", recursive)
+
 	return nil
 }
 
 func (e *EXT3) Recovery() error {
+	fmt.Println("9) Recovery: No implementado")
 	return nil
 }
 
 func (e *EXT3) Loss() error {
+	fmt.Println("10) Loss: No implementado")
 	return nil
 }
 
 func (e *EXT3) Journaling() error {
+
+	fmt.Println("11) Journaling: No implementado")
 	return nil
 }
 

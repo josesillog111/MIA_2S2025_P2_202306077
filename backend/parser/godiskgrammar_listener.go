@@ -118,6 +118,9 @@ type GoDiskGrammarListener interface {
 	// EnterName is called when entering the name production.
 	EnterName(c *NameContext)
 
+	// EnterName_find is called when entering the name_find production.
+	EnterName_find(c *Name_findContext)
+
 	// EnterFilen is called when entering the filen production.
 	EnterFilen(c *FilenContext)
 
@@ -408,6 +411,9 @@ type GoDiskGrammarListener interface {
 
 	// ExitName is called when exiting the name production.
 	ExitName(c *NameContext)
+
+	// ExitName_find is called when exiting the name_find production.
+	ExitName_find(c *Name_findContext)
 
 	// ExitFilen is called when exiting the filen production.
 	ExitFilen(c *FilenContext)

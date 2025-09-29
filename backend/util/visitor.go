@@ -1592,21 +1592,31 @@ func (v *Visitor) VisitFIND(ctx *parser.FINDContext) interface{} {
 			used["path"] = true
 			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
 
-		case param.Name() != nil:
-			if used["destino"] {
-				v.Errors += "FIND: El parámetro 'destino' está duplicado."
+		case param.Name_find() != nil:
+			if used["name"] {
+				v.Errors += "FIND: El parámetro 'name' está duplicado."
 				return nil
 			}
-			used["destino"] = true
-			name = strings.Trim(extractValue(param.Name().STRING_LIT(), param.Name().UNQUOTED_TEXT()), "\"")
+			used["name"] = true
+
+			txt := param.Name_find().GetText()
+
+			if strings.Contains(txt, "*") {
+				name = "*"
+			} else if strings.Contains(txt, "?") {
+				name = "?"
+			} else {
+				name = strings.Trim(extractValue(param.Name_find().STRING_LIT(), param.Name_find().UNQUOTED_TEXT()), "\"")
+			}
 		}
 	}
+
 	if path == "" {
 		v.Errors += "FIND: Falta el parámetro 'path'."
 		return nil
 	}
 	if name == "" {
-		v.Errors += "FIND: Falta el parámetro 'destino'."
+		v.Errors += "FIND: Falta el parámetro 'name'."
 		return nil
 	}
 	if len(v.Errors) > 0 {
@@ -1626,7 +1636,7 @@ func (v *Visitor) VisitFIND(ctx *parser.FINDContext) interface{} {
 		v.Errors += fmt.Sprintf("FIND: No se encontró '%s' en '%s'.", name, path)
 		return nil
 	} else {
-		fmt.Println("Encontrado:", find)
+		//fmt.Println("Encontrado:", find)
 	}
 
 	v.Console += fmt.Sprintf("FIND: Encontrado de '%s' a '%s' exitosamente.\n", path, name)
@@ -1659,8 +1669,13 @@ func (v *Visitor) VisitCHOWN(ctx *parser.CHOWNContext) interface{} {
 				return nil
 			}
 			used["usuario"] = true
-			usuario = strings.Trim(extractValue(param.Usuario().STRING_LIT(), param.Usuario().UNQUOTED_TEXT()), "\"")
 
+			children := param.Usuario().GetChildren()
+			if len(children) == 0 {
+				v.Errors += "CHOWN: El parámetro 'usuario' es inválido."
+				return nil
+			}
+			usuario = cleanQuotes(children[len(children)-1].(antlr.TerminalNode).GetText())
 		case param.R() != nil:
 			if used["recursive"] {
 				v.Errors += "CHOWN: El parámetro 'r' está duplicado."

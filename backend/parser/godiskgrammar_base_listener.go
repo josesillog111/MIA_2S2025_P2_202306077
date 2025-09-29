@@ -242,6 +242,12 @@ func (s *BaseGoDiskGrammarListener) EnterName(ctx *NameContext) {}
 // ExitName is called when production name is exited.
 func (s *BaseGoDiskGrammarListener) ExitName(ctx *NameContext) {}
 
+// EnterName_find is called when production name_find is entered.
+func (s *BaseGoDiskGrammarListener) EnterName_find(ctx *Name_findContext) {}
+
+// ExitName_find is called when production name_find is exited.
+func (s *BaseGoDiskGrammarListener) ExitName_find(ctx *Name_findContext) {}
+
 // EnterFilen is called when production filen is entered.
 func (s *BaseGoDiskGrammarListener) EnterFilen(ctx *FilenContext) {}
 

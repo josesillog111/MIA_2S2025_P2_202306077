@@ -49,6 +49,7 @@ type            : MINUS TYPE ASSIGN ID;
 id_text         : MINUS ID_TEXT ASSIGN ID ;
 path            : MINUS PATH ASSIGN (STRING_LIT | UNQUOTED_TEXT) ;
 name            : MINUS NAME ASSIGN (STRING_LIT | UNQUOTED_TEXT) ;
+name_find       : MINUS NAME ASSIGN (STRING_LIT | UNQUOTED_TEXT | STAR | QUESTION) ;
 filen           : MINUS FILE INT_LIT ASSIGN (STRING_LIT | UNQUOTED_TEXT) ;
 user            : MINUS USER ASSIGN (STRING_LIT | UNQUOTED_TEXT) ;
 pass            : MINUS PASS ASSIGN (STRING_LIT | UNQUOTED_TEXT) ;
@@ -185,7 +186,8 @@ mkfs_param
     ;
 
 cat_param
-    : filen ;
+    : filen 
+    ;
 
 login_param
     : user 
@@ -214,17 +216,20 @@ rmusr_param
 
 chgrp_param
     : user 
-    | grp ;
+    | grp 
+    ;
 
 mkfile_param
     : path 
     | r 
     | size 
-    | cont ;
+    | cont 
+    ;
 
 mkdir_param
     : p 
-    | path ;
+    | path 
+    ;
 
 
 remove_param
@@ -253,7 +258,7 @@ move_param
 
 find_param
     : path 
-    | name 
+    | name_find 
     ;
 
 chown_param

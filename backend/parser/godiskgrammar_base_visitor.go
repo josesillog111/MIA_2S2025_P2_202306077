@@ -155,6 +155,10 @@ func (v *BaseGoDiskGrammarVisitor) VisitName(ctx *NameContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseGoDiskGrammarVisitor) VisitName_find(ctx *Name_findContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseGoDiskGrammarVisitor) VisitFilen(ctx *FilenContext) interface{} {
 	return v.VisitChildren(ctx)
 }
