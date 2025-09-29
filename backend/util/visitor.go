@@ -3,6 +3,7 @@ package util
 import (
 	dmanager "backend/disk_manager"
 	ext2 "backend/ext2_manager"
+	ext3 "backend/ext3_manager"
 	fsys "backend/file_system"
 	parser "backend/parser"
 	"fmt"
@@ -21,14 +22,18 @@ var fileRegex = regexp.MustCompile(`-file(\d+)`)
 
 func (v *Visitor) NewFileSystem(fsType string, partitionId string) (fsys.FileSystem, error) {
 	switch strings.ToLower(fsType) {
-	case "ext2":
+	case "2fs":
 		partition := v.ListMountedPartitions.GetPartitionById(partitionId)
 		if partition == nil {
 			return nil, fmt.Errorf("NewFileSystem: la partición con id '%s' no está montada", partitionId)
 		}
 		return ext2.NewEXT2(*partition), nil
-	case "fat32":
-		return nil, fmt.Errorf("NewFileSystem: Sistema de archivos '%s' no implementado", fsType)
+	case "3fs":
+		partition := v.ListMountedPartitions.GetPartitionById(partitionId)
+		if partition == nil {
+			return nil, fmt.Errorf("NewFileSystem: la partición con id '%s' no está montada", partitionId)
+		}
+		return ext3.NewEXT3(*partition), nil
 	default:
 		return nil, fmt.Errorf("NewFileSystem: Sistema de archivos '%s' no soportado", fsType)
 	}
@@ -138,6 +143,28 @@ func (v *Visitor) VisitProg(ctx *parser.ProgContext) interface{} {
 			v.VisitMKFILE(n)
 		case *parser.MKDIRContext:
 			v.VisitMKDIR(n)
+		case *parser.REMOVEContext:
+			v.VisitREMOVE(n)
+		case *parser.EDITContext:
+			v.VisitEDIT(n)
+		case *parser.RENAMEContext:
+			v.VisitRENAME(n)
+		case *parser.COPYContext:
+			v.VisitCOPY(n)
+		case *parser.MOVEContext:
+			v.VisitMOVE(n)
+		case *parser.FINDContext:
+			v.VisitFIND(n)
+		case *parser.CHOWNContext:
+			v.VisitCHOWN(n)
+		case *parser.CHMODContext:
+			v.VisitCHMOD(n)
+		case *parser.RECOVERYContext:
+			v.VisitRECOVERY(n)
+		case *parser.LOSSContext:
+			v.VisitLOSS(n)
+		case *parser.JOURNALINGContext:
+			v.VisitJOURNALING(n)
 		case *parser.REPContext:
 			v.VisitREP(n)
 		default:
@@ -280,8 +307,8 @@ func (v *Visitor) VisitRMDISK(ctx *parser.RMDISKContext) interface{} {
 
 // Crear partición en un disco
 func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
-	var size int64
-	var path, name string
+	var size, add int64
+	var path, name, delete string
 	unit := "K"     // por defecto
 	partType := "P" // primaria por defecto
 	fit := "WF"     // worst fit por defecto
@@ -394,6 +421,43 @@ func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
 				v.Errors += "FDISK: El tipo de ajuste es inválido. Use BF, FF o WF.\n"
 				return nil
 			}
+		case param.Delete_() != nil:
+			if used["delete"] {
+				v.Errors += "FDISK: El parámetro 'delete' está duplicado.\n"
+				return nil
+			}
+			used["delete"] = true
+
+			delete = cleanQuotes(strings.ToUpper(param.Delete_().ID().GetText()))
+			if delete != "FAST" && delete != "FULL" {
+				v.Errors += "FDISK: El tipo de eliminación es inválido. Use FAST o FULL.\n"
+				return nil
+			}
+		case param.Add() != nil:
+			if used["add"] {
+				v.Errors += "FDISK: El parámetro 'add' está duplicado."
+				return nil
+			}
+			used["add"] = true
+
+			children := param.Add().GetChildren()
+			if len(children) == 0 {
+				v.Errors += "FDISK: El parámetro 'add' es inválido."
+				return nil
+			}
+
+			add = int64(extractInt(children[len(children)-1]))
+			if add <= 0 {
+				v.Errors += "FDISK: El parámetro 'add' debe ser un número entero positivo."
+			}
+
+			txt := param.Add().GetText()
+
+			//tomar el valor negativo. valor válido
+			if strings.Contains(txt, "=-") {
+				add = -add
+			}
+
 		}
 	}
 
@@ -412,7 +476,7 @@ func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
 	}
 
 	// Crear partición
-	err := v.DiskManager.Fdisk(path, size, unit[0], partType[0], fit, name)
+	err := v.DiskManager.Fdisk(path, size, unit[0], partType[0], fit, delete, name, add)
 	if err != nil {
 		v.Errors += fmt.Sprintf("FDISK: Error al crear la partición %s: %v", name, err)
 		return nil
@@ -527,6 +591,49 @@ func (v *Visitor) VisitMOUNT(ctx *parser.MOUNTContext) interface{} {
 	return nil
 }
 
+// Desmontar una partición
+func (v *Visitor) VisitUNMOUNT(ctx *parser.UNMOUNTContext) interface{} {
+	var id string
+	used := make(map[string]bool)
+	// Recorremos los parámetros
+
+	if used["id"] {
+		v.Errors += "UNMOUNT: Parámetro 'id' duplicado.\n"
+		return nil
+	}
+	used["id"] = true
+	children := ctx.Unmount_param().Id_text().GetChildren()
+	if len(children) == 0 {
+		v.Errors += "UNMOUNT: Parámetro 'id' inválido.\n"
+		return nil
+	}
+	// Último token normalmente es el valor del ID
+	id = cleanQuotes(children[len(children)-1].(antlr.TerminalNode).GetText())
+	if len(id) != 4 {
+		v.Errors += "UNMOUNT: El ID debe tener exactamente 4 caracteres.\n"
+		return nil
+	}
+
+	// Validaciones obligatorias
+	if id == "" {
+		v.Errors += "UNMOUNT: Parámetro 'id' obligatorio.\n"
+		return nil
+	}
+	// Verificar que la partición esté montada
+	if v.ListMountedPartitions.GetPathById(id) == "" {
+		v.Errors += fmt.Sprintf("UNMOUNT: No se encontró ninguna partición montada para el ID %s.", id)
+		return nil
+	}
+	// Desmontar la partición
+	if err := v.DiskManager.Unmount(*v.ListMountedPartitions, id); err != nil {
+		v.Errors += fmt.Sprintf("UNMOUNT: Error al desmontar la partición con ID %s: %v", id, err)
+		return nil
+	}
+	v.Console += fmt.Sprintf("UNMOUNT: La partición con ID %s ha sido desmontada correctamente.\n", id)
+	return nil
+
+}
+
 // Listar particiones montadas
 func (v *Visitor) VisitMOUNTED(ctx *parser.MOUNTEDContext) interface{} {
 	if mountedInfo, err := v.DiskManager.Mounted(*v.ListMountedPartitions); err != nil {
@@ -544,7 +651,7 @@ func (v *Visitor) VisitMKFS(ctx *parser.MKFSContext) interface{} {
 
 	// Valores por defecto
 	typeFs = "full"
-	fsName = "ext2"
+	fsName = "2fs"
 
 	// Recorremos parámetros
 	for _, param := range ctx.Mkfs_params().AllMkfs_param() {
@@ -590,6 +697,28 @@ func (v *Visitor) VisitMKFS(ctx *parser.MKFSContext) interface{} {
 				v.Errors += "MKFS: Tipo inválido. Use 'full' o 'fast'.\n"
 				return nil
 			}
+		case param.Fs() != nil:
+			if used["fs"] {
+				v.Errors += "MKFS: Parámetro 'fs' duplicado.\n"
+				return nil
+			}
+			used["fs"] = true
+
+			children := param.Fs().GetChildren()
+			if len(children) == 0 {
+				v.Errors += "MKFS: Parámetro 'fs' inválido.\n"
+				return nil
+			}
+
+			// Último token normalmente es el valor: "ext2" o "ext3"
+			fsName = cleanQuotes(strings.ToLower(children[len(children)-1].(antlr.TerminalNode).GetText()))
+
+			if fsName != "2fs" && fsName != "3fs" {
+				v.Errors += "MKFS: Sistema de archivos inválido. Use '2fs'(EXT2) o '3fs'(EXT3).\n"
+				return nil
+			}
+		default:
+			v.Errors += "MKFS: Parámetro desconocido.\n"
 		}
 	}
 
@@ -1202,7 +1331,572 @@ func (v *Visitor) VisitMKDIR(ctx *parser.MKDIRContext) interface{} {
 	return nil
 }
 
-// Crear un reporte
+// Eliminar un archivo o directorio
+func (v *Visitor) VisitREMOVE(ctx *parser.REMOVEContext) interface{} {
+	var path string
+
+	used := make(map[string]bool)
+
+	if used["path"] {
+		v.Errors += "REMOVE: El parámetro 'path' está duplicado."
+		return nil
+	}
+	used["path"] = true
+	path = strings.Trim(extractValue(ctx.Remove_param().Path().STRING_LIT(), ctx.Remove_param().Path().UNQUOTED_TEXT()), "\"")
+
+	if path == "" {
+		v.Errors += "REMOVE: Falta el parámetro 'path'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "REMOVE: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Remove(path); err != nil {
+		v.Errors += fmt.Sprintf("REMOVE: Error eliminando el archivo o directorio '%s': %v", path, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("REMOVE: Archivo o directorio '%s' eliminado exitosamente.\n", path)
+
+	return nil
+}
+
+// Editar un archivo
+func (v *Visitor) VisitEDIT(ctx *parser.EDITContext) interface{} {
+	var path, contenido string
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Edit_params().AllEdit_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "EDIT: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Contenido() != nil:
+			if used["contenido"] {
+				v.Errors += "EDIT: El parámetro 'contenido' está duplicado."
+				return nil
+			}
+			used["contenido"] = true
+			contenido = extractValue(param.Contenido().STRING_LIT(), param.Contenido().UNQUOTED_TEXT())
+		}
+	}
+	if path == "" {
+		v.Errors += "EDIT: Falta el parámetro 'path'."
+		return nil
+	}
+	if contenido == "" {
+		v.Errors += "EDIT: Falta el parámetro 'contenido'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "EDIT: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Edit(path, contenido); err != nil {
+		v.Errors += fmt.Sprintf("EDIT: Error editando el archivo '%s': %v", path, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("EDIT: Archivo '%s' editado exitosamente.\n", path)
+
+	return nil
+}
+
+// Renombrar un archivo o directorio
+func (v *Visitor) VisitRENAME(ctx *parser.RENAMEContext) interface{} {
+	var path, name string
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Rename_params().AllRename_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "RENAME: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Name() != nil:
+			if used["name"] {
+				v.Errors += "RENAME: El parámetro 'name' está duplicado."
+				return nil
+			}
+			used["name"] = true
+			name = cleanQuotes(param.Name().GetText())
+		}
+	}
+	if path == "" {
+		v.Errors += "RENAME: Falta el parámetro 'path'."
+		return nil
+	}
+	if name == "" {
+		v.Errors += "RENAME: Falta el parámetro 'name'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "RENAME: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Rename(path, name); err != nil {
+		v.Errors += fmt.Sprintf("RENAME: Error renombrando el archivo o directorio '%s': %v", path, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("RENAME: Archivo o directorio '%s' renombrado a '%s' exitosamente.\n", path, name)
+
+	return nil
+}
+
+// Copiar un archivo o directorio
+func (v *Visitor) VisitCOPY(ctx *parser.COPYContext) interface{} {
+	var path, destino string
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Copy_params().AllCopy_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "COPY: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Destino() != nil:
+			if used["destino"] {
+				v.Errors += "COPY: El parámetro 'destino' está duplicado."
+				return nil
+			}
+			used["destino"] = true
+			destino = strings.Trim(extractValue(param.Destino().STRING_LIT(), param.Destino().UNQUOTED_TEXT()), "\"")
+		}
+	}
+	if path == "" {
+		v.Errors += "COPY: Falta el parámetro 'path'."
+		return nil
+	}
+	if destino == "" {
+		v.Errors += "COPY: Falta el parámetro 'destino'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "COPY: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Copy(path, destino); err != nil {
+		v.Errors += fmt.Sprintf("COPY: Error copiando de '%s' a '%s': %v", path, destino, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("COPY: Copiado de '%s' a '%s' exitosamente.\n", path, destino)
+
+	return nil
+}
+
+// Mover un archivo o directorio
+func (v *Visitor) VisitMOVE(ctx *parser.MOVEContext) interface{} {
+	var path, destino string
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Move_params().AllMove_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "MOVE: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Destino() != nil:
+			if used["destino"] {
+				v.Errors += "MOVE: El parámetro 'destino' está duplicado."
+				return nil
+			}
+			used["destino"] = true
+			destino = strings.Trim(extractValue(param.Destino().STRING_LIT(), param.Destino().UNQUOTED_TEXT()), "\"")
+		}
+	}
+	if path == "" {
+		v.Errors += "MOVE: Falta el parámetro 'path'."
+		return nil
+	}
+	if destino == "" {
+		v.Errors += "MOVE: Falta el parámetro 'destino'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "MOVE: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Move(path, destino); err != nil {
+		v.Errors += fmt.Sprintf("MOVE: Error moviendo de '%s' a '%s': %v", path, destino, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("MOVE: Movido de '%s' a '%s' exitosamente.\n", path, destino)
+
+	return nil
+}
+
+// Encontrar un archivo o directorio
+func (v *Visitor) VisitFIND(ctx *parser.FINDContext) interface{} {
+	var path, name string
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Find_params().AllFind_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "FIND: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Name() != nil:
+			if used["destino"] {
+				v.Errors += "FIND: El parámetro 'destino' está duplicado."
+				return nil
+			}
+			used["destino"] = true
+			name = strings.Trim(extractValue(param.Name().STRING_LIT(), param.Name().UNQUOTED_TEXT()), "\"")
+		}
+	}
+	if path == "" {
+		v.Errors += "FIND: Falta el parámetro 'path'."
+		return nil
+	}
+	if name == "" {
+		v.Errors += "FIND: Falta el parámetro 'destino'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "FIND: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if find, err := part.FileSystem.Find(path, name); err != nil {
+		v.Errors += fmt.Sprintf("FIND: Error encontrando de '%s' a '%s': %v", path, name, err)
+		return nil
+	} else if find == "" {
+		v.Errors += fmt.Sprintf("FIND: No se encontró '%s' en '%s'.", name, path)
+		return nil
+	} else {
+		fmt.Println("Encontrado:", find)
+	}
+
+	v.Console += fmt.Sprintf("FIND: Encontrado de '%s' a '%s' exitosamente.\n", path, name)
+
+	return nil
+}
+
+// Cambiar propietario o permisos de un archivo o directorio
+func (v *Visitor) VisitCHOWN(ctx *parser.CHOWNContext) interface{} {
+
+	//obligatorios: path, usuario
+	//opcionales: -r
+	var path, usuario string
+	recursive := false
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Chown_params().AllChown_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "CHOWN: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Usuario() != nil:
+			if used["usuario"] {
+				v.Errors += "CHOWN: El parámetro 'usuario' está duplicado."
+				return nil
+			}
+			used["usuario"] = true
+			usuario = strings.Trim(extractValue(param.Usuario().STRING_LIT(), param.Usuario().UNQUOTED_TEXT()), "\"")
+
+		case param.R() != nil:
+			if used["recursive"] {
+				v.Errors += "CHOWN: El parámetro 'r' está duplicado."
+				return nil
+			}
+			used["recursive"] = true
+			recursive = true
+		}
+	}
+	if path == "" {
+		v.Errors += "CHOWN: Falta el parámetro 'path'."
+		return nil
+	}
+	if usuario == "" {
+		v.Errors += "CHOWN: Falta el parámetro 'usuario'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "CHOWN: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Chown(path, usuario, recursive); err != nil {
+		v.Errors += fmt.Sprintf("CHOWN: Error cambiando propietario de '%s' a '%s': %v", path, usuario, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("CHOWN: Propietario de '%s' cambiado a '%s' exitosamente.\n", path, usuario)
+
+	return nil
+}
+
+// Cambiar permisos de un archivo o directorio
+func (v *Visitor) VisitCHMOD(ctx *parser.CHMODContext) interface{} {
+	var path string
+	var ugo int64
+	recursive := false
+
+	used := make(map[string]bool)
+
+	for _, param := range ctx.Chmod_params().AllChmod_param() {
+		switch {
+		case param.Path() != nil:
+			if used["path"] {
+				v.Errors += "CHMOD: El parámetro 'path' está duplicado."
+				return nil
+			}
+			used["path"] = true
+			path = strings.Trim(extractValue(param.Path().STRING_LIT(), param.Path().UNQUOTED_TEXT()), "\"")
+
+		case param.Ugo() != nil:
+			if used["ugo"] {
+				v.Errors += "CHMOD: El parámetro 'ugo' está duplicado."
+				return nil
+			}
+			used["ugo"] = true
+
+			children := param.Ugo().GetChildren()
+			if len(children) == 0 {
+				v.Errors += "CHMOD: El parámetro 'ugo' es inválido."
+				return nil
+			}
+
+			ugo = int64(extractInt(children[len(children)-1]))
+			if ugo < 0 || ugo > 777 {
+				v.Errors += "CHMOD: El parámetro 'ugo' debe estar entre 0 y 777."
+			}
+
+		case param.R() != nil:
+			if used["recursive"] {
+				v.Errors += "CHMOD: El parámetro 'r' está duplicado."
+				return nil
+			}
+			used["recursive"] = true
+			recursive = true
+		}
+	}
+	if path == "" {
+		v.Errors += "CHMOD: Falta el parámetro 'path'."
+		return nil
+	}
+	if ugo == 0 {
+		v.Errors += "CHMOD: Falta el parámetro 'ugo'."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "CHMOD: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Chmod(path, ugo, recursive); err != nil {
+		v.Errors += fmt.Sprintf("CHMOD: Error cambiando permisos de '%s' a '%d': %v", path, ugo, err)
+		return nil
+	}
+
+	v.Console += fmt.Sprintf("CHMOD: Permisos de '%s' cambiados a '%d' exitosamente.\n", path, ugo)
+
+	return nil
+}
+
+// Recuperar espacio de un archivo o directorio
+func (v *Visitor) VisitRECOVERY(ctx *parser.RECOVERYContext) interface{} {
+	var id string
+
+	used := make(map[string]bool)
+	if used["id"] {
+		v.Errors += "RECOVERY: El parámetro 'id' está duplicado."
+		return nil
+	}
+	used["id"] = true
+
+	children := ctx.Recovery_param().Id_text().GetChildren()
+	if len(children) == 0 {
+		v.Errors += "RECOVERY: El parámetro 'id' es inválido."
+		return nil
+	}
+
+	id = cleanQuotes(children[len(children)-1].(antlr.TerminalNode).GetText())
+	if len(id) != 4 {
+		v.Errors += "RECOVERY: El parámetro 'id' debe tener exactamente 4 caracteres."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(id)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "RECOVERY: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Recovery(); err != nil {
+		v.Errors += fmt.Sprintf("RECOVERY: Error recuperando espacio: %v", err)
+		return nil
+	}
+
+	v.Console += "RECOVERY: Espacio recuperado exitosamente.\n"
+
+	return nil
+}
+
+// Emular una perdida de datos
+func (v *Visitor) VisitLOSS(ctx *parser.LOSSContext) interface{} {
+	var id string
+
+	used := make(map[string]bool)
+	if used["id"] {
+		v.Errors += "LOSS: El parámetro 'id' está duplicado."
+		return nil
+	}
+	used["id"] = true
+
+	children := ctx.Loss_param().Id_text().GetChildren()
+	if len(children) == 0 {
+		v.Errors += "LOSS: El parámetro 'id' es inválido."
+		return nil
+	}
+
+	id = cleanQuotes(children[len(children)-1].(antlr.TerminalNode).GetText())
+	if len(id) != 4 {
+		v.Errors += "LOSS: El parámetro 'id' debe tener exactamente 4 caracteres."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(id)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "LOSS: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Loss(); err != nil {
+		v.Errors += fmt.Sprintf("LOSS: Error recuperando espacio: %v", err)
+		return nil
+	}
+
+	v.Console += "LOSS: Espacio recuperado exitosamente.\n"
+
+	return nil
+}
+
+// Emular una journaling
+func (v *Visitor) VisitJOURNALING(ctx *parser.JOURNALINGContext) interface{} {
+	var id string
+
+	used := make(map[string]bool)
+	if used["id"] {
+		v.Errors += "JOURNALING: El parámetro 'id' está duplicado."
+		return nil
+	}
+	used["id"] = true
+
+	children := ctx.Journaling_param().Id_text().GetChildren()
+	if len(children) == 0 {
+		v.Errors += "JOURNALING: El parámetro 'id' es inválido."
+		return nil
+	}
+
+	id = cleanQuotes(children[len(children)-1].(antlr.TerminalNode).GetText())
+	if len(id) != 4 {
+		v.Errors += "JOURNALING: El parámetro 'id' debe tener exactamente 4 caracteres."
+		return nil
+	}
+	if len(v.Errors) > 0 {
+		return nil
+	}
+
+	part := v.ListMountedPartitions.GetPartitionById(id)
+	if part == nil || part.FileSystem == nil {
+		v.Errors += "JOURNALING: No hay un sistema de archivos encontrado."
+		return nil
+	}
+
+	if err := part.FileSystem.Journaling(); err != nil {
+		v.Errors += fmt.Sprintf("JOURNALING: Error recuperando espacio: %v", err)
+		return nil
+	}
+
+	v.Console += "JOURNALING: Espacio recuperado exitosamente.\n"
+
+	return nil
+}
+
 // Crear un reporte
 func (v *Visitor) VisitREP(ctx *parser.REPContext) interface{} {
 	var name, path, id, pathFileLS string

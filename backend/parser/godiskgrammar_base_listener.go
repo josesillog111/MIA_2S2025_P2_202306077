@@ -56,6 +56,12 @@ func (s *BaseGoDiskGrammarListener) EnterMOUNTED(ctx *MOUNTEDContext) {}
 // ExitMOUNTED is called when production MOUNTED is exited.
 func (s *BaseGoDiskGrammarListener) ExitMOUNTED(ctx *MOUNTEDContext) {}
 
+// EnterUNMOUNT is called when production UNMOUNT is entered.
+func (s *BaseGoDiskGrammarListener) EnterUNMOUNT(ctx *UNMOUNTContext) {}
+
+// ExitUNMOUNT is called when production UNMOUNT is exited.
+func (s *BaseGoDiskGrammarListener) ExitUNMOUNT(ctx *UNMOUNTContext) {}
+
 // EnterMKFS is called when production MKFS is entered.
 func (s *BaseGoDiskGrammarListener) EnterMKFS(ctx *MKFSContext) {}
 
@@ -121,6 +127,72 @@ func (s *BaseGoDiskGrammarListener) EnterMKDIR(ctx *MKDIRContext) {}
 
 // ExitMKDIR is called when production MKDIR is exited.
 func (s *BaseGoDiskGrammarListener) ExitMKDIR(ctx *MKDIRContext) {}
+
+// EnterREMOVE is called when production REMOVE is entered.
+func (s *BaseGoDiskGrammarListener) EnterREMOVE(ctx *REMOVEContext) {}
+
+// ExitREMOVE is called when production REMOVE is exited.
+func (s *BaseGoDiskGrammarListener) ExitREMOVE(ctx *REMOVEContext) {}
+
+// EnterEDIT is called when production EDIT is entered.
+func (s *BaseGoDiskGrammarListener) EnterEDIT(ctx *EDITContext) {}
+
+// ExitEDIT is called when production EDIT is exited.
+func (s *BaseGoDiskGrammarListener) ExitEDIT(ctx *EDITContext) {}
+
+// EnterRENAME is called when production RENAME is entered.
+func (s *BaseGoDiskGrammarListener) EnterRENAME(ctx *RENAMEContext) {}
+
+// ExitRENAME is called when production RENAME is exited.
+func (s *BaseGoDiskGrammarListener) ExitRENAME(ctx *RENAMEContext) {}
+
+// EnterCOPY is called when production COPY is entered.
+func (s *BaseGoDiskGrammarListener) EnterCOPY(ctx *COPYContext) {}
+
+// ExitCOPY is called when production COPY is exited.
+func (s *BaseGoDiskGrammarListener) ExitCOPY(ctx *COPYContext) {}
+
+// EnterMOVE is called when production MOVE is entered.
+func (s *BaseGoDiskGrammarListener) EnterMOVE(ctx *MOVEContext) {}
+
+// ExitMOVE is called when production MOVE is exited.
+func (s *BaseGoDiskGrammarListener) ExitMOVE(ctx *MOVEContext) {}
+
+// EnterFIND is called when production FIND is entered.
+func (s *BaseGoDiskGrammarListener) EnterFIND(ctx *FINDContext) {}
+
+// ExitFIND is called when production FIND is exited.
+func (s *BaseGoDiskGrammarListener) ExitFIND(ctx *FINDContext) {}
+
+// EnterCHOWN is called when production CHOWN is entered.
+func (s *BaseGoDiskGrammarListener) EnterCHOWN(ctx *CHOWNContext) {}
+
+// ExitCHOWN is called when production CHOWN is exited.
+func (s *BaseGoDiskGrammarListener) ExitCHOWN(ctx *CHOWNContext) {}
+
+// EnterCHMOD is called when production CHMOD is entered.
+func (s *BaseGoDiskGrammarListener) EnterCHMOD(ctx *CHMODContext) {}
+
+// ExitCHMOD is called when production CHMOD is exited.
+func (s *BaseGoDiskGrammarListener) ExitCHMOD(ctx *CHMODContext) {}
+
+// EnterRECOVERY is called when production RECOVERY is entered.
+func (s *BaseGoDiskGrammarListener) EnterRECOVERY(ctx *RECOVERYContext) {}
+
+// ExitRECOVERY is called when production RECOVERY is exited.
+func (s *BaseGoDiskGrammarListener) ExitRECOVERY(ctx *RECOVERYContext) {}
+
+// EnterLOSS is called when production LOSS is entered.
+func (s *BaseGoDiskGrammarListener) EnterLOSS(ctx *LOSSContext) {}
+
+// ExitLOSS is called when production LOSS is exited.
+func (s *BaseGoDiskGrammarListener) ExitLOSS(ctx *LOSSContext) {}
+
+// EnterJOURNALING is called when production JOURNALING is entered.
+func (s *BaseGoDiskGrammarListener) EnterJOURNALING(ctx *JOURNALINGContext) {}
+
+// ExitJOURNALING is called when production JOURNALING is exited.
+func (s *BaseGoDiskGrammarListener) ExitJOURNALING(ctx *JOURNALINGContext) {}
 
 // EnterREP is called when production REP is entered.
 func (s *BaseGoDiskGrammarListener) EnterREP(ctx *REPContext) {}
@@ -206,6 +278,48 @@ func (s *BaseGoDiskGrammarListener) EnterPath_file_ls(ctx *Path_file_lsContext) 
 // ExitPath_file_ls is called when production path_file_ls is exited.
 func (s *BaseGoDiskGrammarListener) ExitPath_file_ls(ctx *Path_file_lsContext) {}
 
+// EnterDelete is called when production delete is entered.
+func (s *BaseGoDiskGrammarListener) EnterDelete(ctx *DeleteContext) {}
+
+// ExitDelete is called when production delete is exited.
+func (s *BaseGoDiskGrammarListener) ExitDelete(ctx *DeleteContext) {}
+
+// EnterAdd is called when production add is entered.
+func (s *BaseGoDiskGrammarListener) EnterAdd(ctx *AddContext) {}
+
+// ExitAdd is called when production add is exited.
+func (s *BaseGoDiskGrammarListener) ExitAdd(ctx *AddContext) {}
+
+// EnterFs is called when production fs is entered.
+func (s *BaseGoDiskGrammarListener) EnterFs(ctx *FsContext) {}
+
+// ExitFs is called when production fs is exited.
+func (s *BaseGoDiskGrammarListener) ExitFs(ctx *FsContext) {}
+
+// EnterContenido is called when production contenido is entered.
+func (s *BaseGoDiskGrammarListener) EnterContenido(ctx *ContenidoContext) {}
+
+// ExitContenido is called when production contenido is exited.
+func (s *BaseGoDiskGrammarListener) ExitContenido(ctx *ContenidoContext) {}
+
+// EnterDestino is called when production destino is entered.
+func (s *BaseGoDiskGrammarListener) EnterDestino(ctx *DestinoContext) {}
+
+// ExitDestino is called when production destino is exited.
+func (s *BaseGoDiskGrammarListener) ExitDestino(ctx *DestinoContext) {}
+
+// EnterUsuario is called when production usuario is entered.
+func (s *BaseGoDiskGrammarListener) EnterUsuario(ctx *UsuarioContext) {}
+
+// ExitUsuario is called when production usuario is exited.
+func (s *BaseGoDiskGrammarListener) ExitUsuario(ctx *UsuarioContext) {}
+
+// EnterUgo is called when production ugo is entered.
+func (s *BaseGoDiskGrammarListener) EnterUgo(ctx *UgoContext) {}
+
+// ExitUgo is called when production ugo is exited.
+func (s *BaseGoDiskGrammarListener) ExitUgo(ctx *UgoContext) {}
+
 // EnterP is called when production p is entered.
 func (s *BaseGoDiskGrammarListener) EnterP(ctx *PContext) {}
 
@@ -278,6 +392,48 @@ func (s *BaseGoDiskGrammarListener) EnterMkdir_params(ctx *Mkdir_paramsContext) 
 // ExitMkdir_params is called when production mkdir_params is exited.
 func (s *BaseGoDiskGrammarListener) ExitMkdir_params(ctx *Mkdir_paramsContext) {}
 
+// EnterEdit_params is called when production edit_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterEdit_params(ctx *Edit_paramsContext) {}
+
+// ExitEdit_params is called when production edit_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitEdit_params(ctx *Edit_paramsContext) {}
+
+// EnterRename_params is called when production rename_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterRename_params(ctx *Rename_paramsContext) {}
+
+// ExitRename_params is called when production rename_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitRename_params(ctx *Rename_paramsContext) {}
+
+// EnterCopy_params is called when production copy_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterCopy_params(ctx *Copy_paramsContext) {}
+
+// ExitCopy_params is called when production copy_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitCopy_params(ctx *Copy_paramsContext) {}
+
+// EnterMove_params is called when production move_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterMove_params(ctx *Move_paramsContext) {}
+
+// ExitMove_params is called when production move_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitMove_params(ctx *Move_paramsContext) {}
+
+// EnterFind_params is called when production find_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterFind_params(ctx *Find_paramsContext) {}
+
+// ExitFind_params is called when production find_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitFind_params(ctx *Find_paramsContext) {}
+
+// EnterChown_params is called when production chown_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterChown_params(ctx *Chown_paramsContext) {}
+
+// ExitChown_params is called when production chown_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitChown_params(ctx *Chown_paramsContext) {}
+
+// EnterChmod_params is called when production chmod_params is entered.
+func (s *BaseGoDiskGrammarListener) EnterChmod_params(ctx *Chmod_paramsContext) {}
+
+// ExitChmod_params is called when production chmod_params is exited.
+func (s *BaseGoDiskGrammarListener) ExitChmod_params(ctx *Chmod_paramsContext) {}
+
 // EnterRep_params is called when production rep_params is entered.
 func (s *BaseGoDiskGrammarListener) EnterRep_params(ctx *Rep_paramsContext) {}
 
@@ -307,6 +463,12 @@ func (s *BaseGoDiskGrammarListener) EnterMount_param(ctx *Mount_paramContext) {}
 
 // ExitMount_param is called when production mount_param is exited.
 func (s *BaseGoDiskGrammarListener) ExitMount_param(ctx *Mount_paramContext) {}
+
+// EnterUnmount_param is called when production unmount_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterUnmount_param(ctx *Unmount_paramContext) {}
+
+// ExitUnmount_param is called when production unmount_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitUnmount_param(ctx *Unmount_paramContext) {}
 
 // EnterMkfs_param is called when production mkfs_param is entered.
 func (s *BaseGoDiskGrammarListener) EnterMkfs_param(ctx *Mkfs_paramContext) {}
@@ -367,6 +529,72 @@ func (s *BaseGoDiskGrammarListener) EnterMkdir_param(ctx *Mkdir_paramContext) {}
 
 // ExitMkdir_param is called when production mkdir_param is exited.
 func (s *BaseGoDiskGrammarListener) ExitMkdir_param(ctx *Mkdir_paramContext) {}
+
+// EnterRemove_param is called when production remove_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterRemove_param(ctx *Remove_paramContext) {}
+
+// ExitRemove_param is called when production remove_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitRemove_param(ctx *Remove_paramContext) {}
+
+// EnterEdit_param is called when production edit_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterEdit_param(ctx *Edit_paramContext) {}
+
+// ExitEdit_param is called when production edit_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitEdit_param(ctx *Edit_paramContext) {}
+
+// EnterRename_param is called when production rename_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterRename_param(ctx *Rename_paramContext) {}
+
+// ExitRename_param is called when production rename_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitRename_param(ctx *Rename_paramContext) {}
+
+// EnterCopy_param is called when production copy_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterCopy_param(ctx *Copy_paramContext) {}
+
+// ExitCopy_param is called when production copy_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitCopy_param(ctx *Copy_paramContext) {}
+
+// EnterMove_param is called when production move_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterMove_param(ctx *Move_paramContext) {}
+
+// ExitMove_param is called when production move_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitMove_param(ctx *Move_paramContext) {}
+
+// EnterFind_param is called when production find_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterFind_param(ctx *Find_paramContext) {}
+
+// ExitFind_param is called when production find_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitFind_param(ctx *Find_paramContext) {}
+
+// EnterChown_param is called when production chown_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterChown_param(ctx *Chown_paramContext) {}
+
+// ExitChown_param is called when production chown_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitChown_param(ctx *Chown_paramContext) {}
+
+// EnterChmod_param is called when production chmod_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterChmod_param(ctx *Chmod_paramContext) {}
+
+// ExitChmod_param is called when production chmod_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitChmod_param(ctx *Chmod_paramContext) {}
+
+// EnterRecovery_param is called when production recovery_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterRecovery_param(ctx *Recovery_paramContext) {}
+
+// ExitRecovery_param is called when production recovery_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitRecovery_param(ctx *Recovery_paramContext) {}
+
+// EnterLoss_param is called when production loss_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterLoss_param(ctx *Loss_paramContext) {}
+
+// ExitLoss_param is called when production loss_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitLoss_param(ctx *Loss_paramContext) {}
+
+// EnterJournaling_param is called when production journaling_param is entered.
+func (s *BaseGoDiskGrammarListener) EnterJournaling_param(ctx *Journaling_paramContext) {}
+
+// ExitJournaling_param is called when production journaling_param is exited.
+func (s *BaseGoDiskGrammarListener) ExitJournaling_param(ctx *Journaling_paramContext) {}
 
 // EnterRep_param is called when production rep_param is entered.
 func (s *BaseGoDiskGrammarListener) EnterRep_param(ctx *Rep_paramContext) {}

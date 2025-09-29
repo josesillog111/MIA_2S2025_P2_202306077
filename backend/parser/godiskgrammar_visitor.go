@@ -25,6 +25,9 @@ type GoDiskGrammarVisitor interface {
 	// Visit a parse tree produced by GoDiskGrammar#MOUNTED.
 	VisitMOUNTED(ctx *MOUNTEDContext) interface{}
 
+	// Visit a parse tree produced by GoDiskGrammar#UNMOUNT.
+	VisitUNMOUNT(ctx *UNMOUNTContext) interface{}
+
 	// Visit a parse tree produced by GoDiskGrammar#MKFS.
 	VisitMKFS(ctx *MKFSContext) interface{}
 
@@ -57,6 +60,39 @@ type GoDiskGrammarVisitor interface {
 
 	// Visit a parse tree produced by GoDiskGrammar#MKDIR.
 	VisitMKDIR(ctx *MKDIRContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#REMOVE.
+	VisitREMOVE(ctx *REMOVEContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#EDIT.
+	VisitEDIT(ctx *EDITContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#RENAME.
+	VisitRENAME(ctx *RENAMEContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#COPY.
+	VisitCOPY(ctx *COPYContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#MOVE.
+	VisitMOVE(ctx *MOVEContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#FIND.
+	VisitFIND(ctx *FINDContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#CHOWN.
+	VisitCHOWN(ctx *CHOWNContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#CHMOD.
+	VisitCHMOD(ctx *CHMODContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#RECOVERY.
+	VisitRECOVERY(ctx *RECOVERYContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#LOSS.
+	VisitLOSS(ctx *LOSSContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#JOURNALING.
+	VisitJOURNALING(ctx *JOURNALINGContext) interface{}
 
 	// Visit a parse tree produced by GoDiskGrammar#REP.
 	VisitREP(ctx *REPContext) interface{}
@@ -100,6 +136,27 @@ type GoDiskGrammarVisitor interface {
 	// Visit a parse tree produced by GoDiskGrammar#path_file_ls.
 	VisitPath_file_ls(ctx *Path_file_lsContext) interface{}
 
+	// Visit a parse tree produced by GoDiskGrammar#delete.
+	VisitDelete(ctx *DeleteContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#add.
+	VisitAdd(ctx *AddContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#fs.
+	VisitFs(ctx *FsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#contenido.
+	VisitContenido(ctx *ContenidoContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#destino.
+	VisitDestino(ctx *DestinoContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#usuario.
+	VisitUsuario(ctx *UsuarioContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#ugo.
+	VisitUgo(ctx *UgoContext) interface{}
+
 	// Visit a parse tree produced by GoDiskGrammar#p.
 	VisitP(ctx *PContext) interface{}
 
@@ -136,6 +193,27 @@ type GoDiskGrammarVisitor interface {
 	// Visit a parse tree produced by GoDiskGrammar#mkdir_params.
 	VisitMkdir_params(ctx *Mkdir_paramsContext) interface{}
 
+	// Visit a parse tree produced by GoDiskGrammar#edit_params.
+	VisitEdit_params(ctx *Edit_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#rename_params.
+	VisitRename_params(ctx *Rename_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#copy_params.
+	VisitCopy_params(ctx *Copy_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#move_params.
+	VisitMove_params(ctx *Move_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#find_params.
+	VisitFind_params(ctx *Find_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#chown_params.
+	VisitChown_params(ctx *Chown_paramsContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#chmod_params.
+	VisitChmod_params(ctx *Chmod_paramsContext) interface{}
+
 	// Visit a parse tree produced by GoDiskGrammar#rep_params.
 	VisitRep_params(ctx *Rep_paramsContext) interface{}
 
@@ -150,6 +228,9 @@ type GoDiskGrammarVisitor interface {
 
 	// Visit a parse tree produced by GoDiskGrammar#mount_param.
 	VisitMount_param(ctx *Mount_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#unmount_param.
+	VisitUnmount_param(ctx *Unmount_paramContext) interface{}
 
 	// Visit a parse tree produced by GoDiskGrammar#mkfs_param.
 	VisitMkfs_param(ctx *Mkfs_paramContext) interface{}
@@ -180,6 +261,39 @@ type GoDiskGrammarVisitor interface {
 
 	// Visit a parse tree produced by GoDiskGrammar#mkdir_param.
 	VisitMkdir_param(ctx *Mkdir_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#remove_param.
+	VisitRemove_param(ctx *Remove_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#edit_param.
+	VisitEdit_param(ctx *Edit_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#rename_param.
+	VisitRename_param(ctx *Rename_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#copy_param.
+	VisitCopy_param(ctx *Copy_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#move_param.
+	VisitMove_param(ctx *Move_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#find_param.
+	VisitFind_param(ctx *Find_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#chown_param.
+	VisitChown_param(ctx *Chown_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#chmod_param.
+	VisitChmod_param(ctx *Chmod_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#recovery_param.
+	VisitRecovery_param(ctx *Recovery_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#loss_param.
+	VisitLoss_param(ctx *Loss_paramContext) interface{}
+
+	// Visit a parse tree produced by GoDiskGrammar#journaling_param.
+	VisitJournaling_param(ctx *Journaling_paramContext) interface{}
 
 	// Visit a parse tree produced by GoDiskGrammar#rep_param.
 	VisitRep_param(ctx *Rep_paramContext) interface{}

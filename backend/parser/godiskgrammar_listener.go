@@ -25,6 +25,9 @@ type GoDiskGrammarListener interface {
 	// EnterMOUNTED is called when entering the MOUNTED production.
 	EnterMOUNTED(c *MOUNTEDContext)
 
+	// EnterUNMOUNT is called when entering the UNMOUNT production.
+	EnterUNMOUNT(c *UNMOUNTContext)
+
 	// EnterMKFS is called when entering the MKFS production.
 	EnterMKFS(c *MKFSContext)
 
@@ -57,6 +60,39 @@ type GoDiskGrammarListener interface {
 
 	// EnterMKDIR is called when entering the MKDIR production.
 	EnterMKDIR(c *MKDIRContext)
+
+	// EnterREMOVE is called when entering the REMOVE production.
+	EnterREMOVE(c *REMOVEContext)
+
+	// EnterEDIT is called when entering the EDIT production.
+	EnterEDIT(c *EDITContext)
+
+	// EnterRENAME is called when entering the RENAME production.
+	EnterRENAME(c *RENAMEContext)
+
+	// EnterCOPY is called when entering the COPY production.
+	EnterCOPY(c *COPYContext)
+
+	// EnterMOVE is called when entering the MOVE production.
+	EnterMOVE(c *MOVEContext)
+
+	// EnterFIND is called when entering the FIND production.
+	EnterFIND(c *FINDContext)
+
+	// EnterCHOWN is called when entering the CHOWN production.
+	EnterCHOWN(c *CHOWNContext)
+
+	// EnterCHMOD is called when entering the CHMOD production.
+	EnterCHMOD(c *CHMODContext)
+
+	// EnterRECOVERY is called when entering the RECOVERY production.
+	EnterRECOVERY(c *RECOVERYContext)
+
+	// EnterLOSS is called when entering the LOSS production.
+	EnterLOSS(c *LOSSContext)
+
+	// EnterJOURNALING is called when entering the JOURNALING production.
+	EnterJOURNALING(c *JOURNALINGContext)
 
 	// EnterREP is called when entering the REP production.
 	EnterREP(c *REPContext)
@@ -100,6 +136,27 @@ type GoDiskGrammarListener interface {
 	// EnterPath_file_ls is called when entering the path_file_ls production.
 	EnterPath_file_ls(c *Path_file_lsContext)
 
+	// EnterDelete is called when entering the delete production.
+	EnterDelete(c *DeleteContext)
+
+	// EnterAdd is called when entering the add production.
+	EnterAdd(c *AddContext)
+
+	// EnterFs is called when entering the fs production.
+	EnterFs(c *FsContext)
+
+	// EnterContenido is called when entering the contenido production.
+	EnterContenido(c *ContenidoContext)
+
+	// EnterDestino is called when entering the destino production.
+	EnterDestino(c *DestinoContext)
+
+	// EnterUsuario is called when entering the usuario production.
+	EnterUsuario(c *UsuarioContext)
+
+	// EnterUgo is called when entering the ugo production.
+	EnterUgo(c *UgoContext)
+
 	// EnterP is called when entering the p production.
 	EnterP(c *PContext)
 
@@ -136,6 +193,27 @@ type GoDiskGrammarListener interface {
 	// EnterMkdir_params is called when entering the mkdir_params production.
 	EnterMkdir_params(c *Mkdir_paramsContext)
 
+	// EnterEdit_params is called when entering the edit_params production.
+	EnterEdit_params(c *Edit_paramsContext)
+
+	// EnterRename_params is called when entering the rename_params production.
+	EnterRename_params(c *Rename_paramsContext)
+
+	// EnterCopy_params is called when entering the copy_params production.
+	EnterCopy_params(c *Copy_paramsContext)
+
+	// EnterMove_params is called when entering the move_params production.
+	EnterMove_params(c *Move_paramsContext)
+
+	// EnterFind_params is called when entering the find_params production.
+	EnterFind_params(c *Find_paramsContext)
+
+	// EnterChown_params is called when entering the chown_params production.
+	EnterChown_params(c *Chown_paramsContext)
+
+	// EnterChmod_params is called when entering the chmod_params production.
+	EnterChmod_params(c *Chmod_paramsContext)
+
 	// EnterRep_params is called when entering the rep_params production.
 	EnterRep_params(c *Rep_paramsContext)
 
@@ -150,6 +228,9 @@ type GoDiskGrammarListener interface {
 
 	// EnterMount_param is called when entering the mount_param production.
 	EnterMount_param(c *Mount_paramContext)
+
+	// EnterUnmount_param is called when entering the unmount_param production.
+	EnterUnmount_param(c *Unmount_paramContext)
 
 	// EnterMkfs_param is called when entering the mkfs_param production.
 	EnterMkfs_param(c *Mkfs_paramContext)
@@ -181,6 +262,39 @@ type GoDiskGrammarListener interface {
 	// EnterMkdir_param is called when entering the mkdir_param production.
 	EnterMkdir_param(c *Mkdir_paramContext)
 
+	// EnterRemove_param is called when entering the remove_param production.
+	EnterRemove_param(c *Remove_paramContext)
+
+	// EnterEdit_param is called when entering the edit_param production.
+	EnterEdit_param(c *Edit_paramContext)
+
+	// EnterRename_param is called when entering the rename_param production.
+	EnterRename_param(c *Rename_paramContext)
+
+	// EnterCopy_param is called when entering the copy_param production.
+	EnterCopy_param(c *Copy_paramContext)
+
+	// EnterMove_param is called when entering the move_param production.
+	EnterMove_param(c *Move_paramContext)
+
+	// EnterFind_param is called when entering the find_param production.
+	EnterFind_param(c *Find_paramContext)
+
+	// EnterChown_param is called when entering the chown_param production.
+	EnterChown_param(c *Chown_paramContext)
+
+	// EnterChmod_param is called when entering the chmod_param production.
+	EnterChmod_param(c *Chmod_paramContext)
+
+	// EnterRecovery_param is called when entering the recovery_param production.
+	EnterRecovery_param(c *Recovery_paramContext)
+
+	// EnterLoss_param is called when entering the loss_param production.
+	EnterLoss_param(c *Loss_paramContext)
+
+	// EnterJournaling_param is called when entering the journaling_param production.
+	EnterJournaling_param(c *Journaling_paramContext)
+
 	// EnterRep_param is called when entering the rep_param production.
 	EnterRep_param(c *Rep_paramContext)
 
@@ -201,6 +315,9 @@ type GoDiskGrammarListener interface {
 
 	// ExitMOUNTED is called when exiting the MOUNTED production.
 	ExitMOUNTED(c *MOUNTEDContext)
+
+	// ExitUNMOUNT is called when exiting the UNMOUNT production.
+	ExitUNMOUNT(c *UNMOUNTContext)
 
 	// ExitMKFS is called when exiting the MKFS production.
 	ExitMKFS(c *MKFSContext)
@@ -234,6 +351,39 @@ type GoDiskGrammarListener interface {
 
 	// ExitMKDIR is called when exiting the MKDIR production.
 	ExitMKDIR(c *MKDIRContext)
+
+	// ExitREMOVE is called when exiting the REMOVE production.
+	ExitREMOVE(c *REMOVEContext)
+
+	// ExitEDIT is called when exiting the EDIT production.
+	ExitEDIT(c *EDITContext)
+
+	// ExitRENAME is called when exiting the RENAME production.
+	ExitRENAME(c *RENAMEContext)
+
+	// ExitCOPY is called when exiting the COPY production.
+	ExitCOPY(c *COPYContext)
+
+	// ExitMOVE is called when exiting the MOVE production.
+	ExitMOVE(c *MOVEContext)
+
+	// ExitFIND is called when exiting the FIND production.
+	ExitFIND(c *FINDContext)
+
+	// ExitCHOWN is called when exiting the CHOWN production.
+	ExitCHOWN(c *CHOWNContext)
+
+	// ExitCHMOD is called when exiting the CHMOD production.
+	ExitCHMOD(c *CHMODContext)
+
+	// ExitRECOVERY is called when exiting the RECOVERY production.
+	ExitRECOVERY(c *RECOVERYContext)
+
+	// ExitLOSS is called when exiting the LOSS production.
+	ExitLOSS(c *LOSSContext)
+
+	// ExitJOURNALING is called when exiting the JOURNALING production.
+	ExitJOURNALING(c *JOURNALINGContext)
 
 	// ExitREP is called when exiting the REP production.
 	ExitREP(c *REPContext)
@@ -277,6 +427,27 @@ type GoDiskGrammarListener interface {
 	// ExitPath_file_ls is called when exiting the path_file_ls production.
 	ExitPath_file_ls(c *Path_file_lsContext)
 
+	// ExitDelete is called when exiting the delete production.
+	ExitDelete(c *DeleteContext)
+
+	// ExitAdd is called when exiting the add production.
+	ExitAdd(c *AddContext)
+
+	// ExitFs is called when exiting the fs production.
+	ExitFs(c *FsContext)
+
+	// ExitContenido is called when exiting the contenido production.
+	ExitContenido(c *ContenidoContext)
+
+	// ExitDestino is called when exiting the destino production.
+	ExitDestino(c *DestinoContext)
+
+	// ExitUsuario is called when exiting the usuario production.
+	ExitUsuario(c *UsuarioContext)
+
+	// ExitUgo is called when exiting the ugo production.
+	ExitUgo(c *UgoContext)
+
 	// ExitP is called when exiting the p production.
 	ExitP(c *PContext)
 
@@ -313,6 +484,27 @@ type GoDiskGrammarListener interface {
 	// ExitMkdir_params is called when exiting the mkdir_params production.
 	ExitMkdir_params(c *Mkdir_paramsContext)
 
+	// ExitEdit_params is called when exiting the edit_params production.
+	ExitEdit_params(c *Edit_paramsContext)
+
+	// ExitRename_params is called when exiting the rename_params production.
+	ExitRename_params(c *Rename_paramsContext)
+
+	// ExitCopy_params is called when exiting the copy_params production.
+	ExitCopy_params(c *Copy_paramsContext)
+
+	// ExitMove_params is called when exiting the move_params production.
+	ExitMove_params(c *Move_paramsContext)
+
+	// ExitFind_params is called when exiting the find_params production.
+	ExitFind_params(c *Find_paramsContext)
+
+	// ExitChown_params is called when exiting the chown_params production.
+	ExitChown_params(c *Chown_paramsContext)
+
+	// ExitChmod_params is called when exiting the chmod_params production.
+	ExitChmod_params(c *Chmod_paramsContext)
+
 	// ExitRep_params is called when exiting the rep_params production.
 	ExitRep_params(c *Rep_paramsContext)
 
@@ -327,6 +519,9 @@ type GoDiskGrammarListener interface {
 
 	// ExitMount_param is called when exiting the mount_param production.
 	ExitMount_param(c *Mount_paramContext)
+
+	// ExitUnmount_param is called when exiting the unmount_param production.
+	ExitUnmount_param(c *Unmount_paramContext)
 
 	// ExitMkfs_param is called when exiting the mkfs_param production.
 	ExitMkfs_param(c *Mkfs_paramContext)
@@ -357,6 +552,39 @@ type GoDiskGrammarListener interface {
 
 	// ExitMkdir_param is called when exiting the mkdir_param production.
 	ExitMkdir_param(c *Mkdir_paramContext)
+
+	// ExitRemove_param is called when exiting the remove_param production.
+	ExitRemove_param(c *Remove_paramContext)
+
+	// ExitEdit_param is called when exiting the edit_param production.
+	ExitEdit_param(c *Edit_paramContext)
+
+	// ExitRename_param is called when exiting the rename_param production.
+	ExitRename_param(c *Rename_paramContext)
+
+	// ExitCopy_param is called when exiting the copy_param production.
+	ExitCopy_param(c *Copy_paramContext)
+
+	// ExitMove_param is called when exiting the move_param production.
+	ExitMove_param(c *Move_paramContext)
+
+	// ExitFind_param is called when exiting the find_param production.
+	ExitFind_param(c *Find_paramContext)
+
+	// ExitChown_param is called when exiting the chown_param production.
+	ExitChown_param(c *Chown_paramContext)
+
+	// ExitChmod_param is called when exiting the chmod_param production.
+	ExitChmod_param(c *Chmod_paramContext)
+
+	// ExitRecovery_param is called when exiting the recovery_param production.
+	ExitRecovery_param(c *Recovery_paramContext)
+
+	// ExitLoss_param is called when exiting the loss_param production.
+	ExitLoss_param(c *Loss_paramContext)
+
+	// ExitJournaling_param is called when exiting the journaling_param production.
+	ExitJournaling_param(c *Journaling_paramContext)
 
 	// ExitRep_param is called when exiting the rep_param production.
 	ExitRep_param(c *Rep_paramContext)

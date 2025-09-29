@@ -1,8 +1,8 @@
-package ext2
+package ext3
 
 import (
 	dmanager "backend/disk_manager"
-	file "backend/ext2_structs"
+	file "backend/ext3_structs"
 	rep "backend/report_manager"
 	"fmt"
 	"os"
@@ -16,7 +16,7 @@ const (
 	FILE_TYPE byte = 1
 )
 
-type EXT2 struct {
+type EXT3 struct {
 	Partition        dmanager.MountedPartition
 	SBManager        *SBManager
 	FileManager      FileManager
@@ -26,12 +26,12 @@ type EXT2 struct {
 	LoggedUser       file.User // usuario actualmente logueado
 }
 
-func NewEXT2(partition dmanager.MountedPartition) *EXT2 {
+func NewEXT3(partition dmanager.MountedPartition) *EXT3 {
 	sbm := NewSBManager(partition)
 	sbm.UpdateLastMountedDate()
 	sbm.UpdateMountedCount()
 
-	return &EXT2{
+	return &EXT3{
 		Partition:        partition,
 		SBManager:        sbm,
 		FileManager:      *NewFileManager(partition, sbm),
@@ -43,7 +43,7 @@ func NewEXT2(partition dmanager.MountedPartition) *EXT2 {
 }
 
 /*	Funciones privadas	*/
-func (e *EXT2) clearPartition() error {
+func (e *EXT3) clearPartition() error {
 	partition_start := e.Partition.Partition.Part_start
 	partition_size := e.Partition.Partition.Part_size
 
@@ -64,7 +64,7 @@ func (e *EXT2) clearPartition() error {
 }
 
 // getUserInfo returns the UID and GID for a given username by reading /users.txt
-func (e *EXT2) getUserInfo(username string) (file.User, error) {
+func (e *EXT3) getUserInfo(username string) (file.User, error) {
 	var info file.User
 	parentInode, fileName, err := e.DirectoryManager.ResolvePath("/users.txt")
 	if err != nil {
@@ -105,7 +105,7 @@ func (e *EXT2) getUserInfo(username string) (file.User, error) {
 	return info, nil
 }
 
-func (e *EXT2) hasPermission(inode file.Inode, mode string) bool {
+func (e *EXT3) hasPermission(inode file.Inode, mode string) bool {
 	// Obtener usuario logueado
 	if !e.isLogged() {
 		return false
@@ -128,7 +128,7 @@ func (e *EXT2) hasPermission(inode file.Inode, mode string) bool {
 	return e.checkBits(uint16(inode.I_permissions&7), mode)
 }
 
-func (e *EXT2) checkBits(bits uint16, mode string) bool {
+func (e *EXT3) checkBits(bits uint16, mode string) bool {
 	switch mode {
 	case "r":
 		return bits&4 != 0
@@ -140,11 +140,11 @@ func (e *EXT2) checkBits(bits uint16, mode string) bool {
 	return false
 }
 
-func (e *EXT2) isLogged() bool {
+func (e *EXT3) isLogged() bool {
 	return e.LoggedUser != (file.User{})
 }
 
-func (e *EXT2) isUserRoot() bool {
+func (e *EXT3) isUserRoot() bool {
 	return e.LoggedUser.Name == "root"
 }
 
@@ -155,7 +155,7 @@ func (e *EXT2) isUserRoot() bool {
 */
 
 // mkfs
-func (e *EXT2) Mkfs(id string, typeFormat string) error {
+func (e *EXT3) Mkfs(id string, typeFormat string) error {
 	// 1. Limpiar partición
 
 	if err := e.clearPartition(); err != nil {
@@ -202,7 +202,7 @@ func (e *EXT2) Mkfs(id string, typeFormat string) error {
 }
 
 // cat
-func (e *EXT2) Cat(paths ...string) (string, error) {
+func (e *EXT3) Cat(paths ...string) (string, error) {
 	if !e.isLogged() {
 		return "", fmt.Errorf("Cat: No hay ningún usuario logueado")
 	}
@@ -247,7 +247,7 @@ func (e *EXT2) Cat(paths ...string) (string, error) {
 }
 
 // login
-func (e *EXT2) Login(username string, password string) error {
+func (e *EXT3) Login(username string, password string) error {
 	// 1. Resolver /users.txt
 	parentInode, fileName, err := e.DirectoryManager.ResolvePath("/users.txt")
 	if err != nil {
@@ -311,7 +311,7 @@ func (e *EXT2) Login(username string, password string) error {
 }
 
 // logout
-func (e *EXT2) Logout() error {
+func (e *EXT3) Logout() error {
 	if !e.isLogged() {
 		return fmt.Errorf("Logout: No hay ningún usuario logueado")
 	}
@@ -320,7 +320,7 @@ func (e *EXT2) Logout() error {
 }
 
 // Crear grupo | Loguado como root
-func (e *EXT2) Mkgrp(name string) error {
+func (e *EXT3) Mkgrp(name string) error {
 	if !e.isUserRoot() {
 		return fmt.Errorf("Mkgrp: Operación no permitida, solo el usuario root puede crear grupos")
 	}
@@ -366,7 +366,7 @@ func (e *EXT2) Mkgrp(name string) error {
 }
 
 // Eliminar grupo | Loguado como root
-func (e *EXT2) Rmgrp(name string) error {
+func (e *EXT3) Rmgrp(name string) error {
 	if !e.isUserRoot() {
 		return fmt.Errorf("Rmgrp: Operación no permitida, solo el usuario root puede eliminar grupos")
 	}
@@ -422,7 +422,7 @@ func (e *EXT2) Rmgrp(name string) error {
 }
 
 // Crear usuario | Logueado como root
-func (e *EXT2) Mkusr(name, pass, grp string) error {
+func (e *EXT3) Mkusr(name, pass, grp string) error {
 	if !e.isUserRoot() {
 		return fmt.Errorf("Mkusr: Operación no permitida, solo el usuario root puede crear usuarios")
 	}
@@ -475,7 +475,7 @@ func (e *EXT2) Mkusr(name, pass, grp string) error {
 }
 
 // Eliminar usuario | Logueado como root
-func (e *EXT2) Rmusr(name string) error {
+func (e *EXT3) Rmusr(name string) error {
 	if !e.isUserRoot() {
 		return fmt.Errorf("Rmusr: Operación no permitida, solo el usuario root puede eliminar usuarios")
 	}
@@ -526,7 +526,7 @@ func (e *EXT2) Rmusr(name string) error {
 }
 
 // Cambiar grupo de usuario | Logueado como root
-func (e *EXT2) Chgrp(name string, newgrp string) error {
+func (e *EXT3) Chgrp(name string, newgrp string) error {
 	if !e.isUserRoot() {
 		return fmt.Errorf("Chgrp: Operación no permitida, solo el usuario root puede cambiar grupos")
 	}
@@ -601,7 +601,7 @@ func (e *EXT2) Chgrp(name string, newgrp string) error {
 }
 
 // mkfile
-func (e *EXT2) Mkfile(virtualPath string, recursive bool, size int64, content string) error {
+func (e *EXT3) Mkfile(virtualPath string, recursive bool, size int64, content string) error {
 	// Normalizar la ruta
 	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
 
@@ -715,7 +715,7 @@ func (e *EXT2) Mkfile(virtualPath string, recursive bool, size int64, content st
 }
 
 // mkdir
-func (e *EXT2) Mkdir(virtualPath string, p bool) error {
+func (e *EXT3) Mkdir(virtualPath string, p bool) error {
 	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
 
 	// Caso raíz
@@ -847,55 +847,51 @@ func (e *EXT2) Mkdir(virtualPath string, p bool) error {
 	return nil
 }
 
-func (e *EXT2) Remove(path string) error {
+func (e *EXT3) Remove(path string) error {
 	return nil
 }
 
-func (e *EXT2) Edit(path string, contenido string) error {
+func (e *EXT3) Edit(path string, contenido string) error {
 	return nil
 }
 
-func (e *EXT2) Rename(path string, name string) error {
+func (e *EXT3) Rename(path string, name string) error {
 	return nil
 }
 
-func (e *EXT2) Copy(path string, dest string) error {
+func (e *EXT3) Copy(path string, dest string) error {
 	return nil
 }
 
-func (e *EXT2) Move(path string, dest string) error {
+func (e *EXT3) Move(path string, dest string) error {
 	return nil
 }
 
-func (e *EXT2) Find(path string, name string) (string, error) {
+func (e *EXT3) Find(path string, name string) (string, error) {
 	return "", nil
 }
 
-func (e *EXT2) Chown(path string, user string, recursive bool) error {
+func (e *EXT3) Chown(path string, user string, recursive bool) error {
 	return nil
 }
 
-func (e *EXT2) Chmod(path string, ugo int64, recursive bool) error {
+func (e *EXT3) Chmod(path string, ugo int64, recursive bool) error {
 	return nil
 }
 
-func (e *EXT2) Recovery() error {
-	fmt.Println("EXT2 no cuenta con soporte para recuperación de datos")
+func (e *EXT3) Recovery() error {
 	return nil
 }
 
-func (e *EXT2) Loss() error {
-	fmt.Println("EXT2 no cuenta con soporte para pérdida de datos")
+func (e *EXT3) Loss() error {
 	return nil
 }
 
-func (e *EXT2) Journaling() error {
-	fmt.Println("EXT2 no cuenta con soporte para journaling")
+func (e *EXT3) Journaling() error {
 	return nil
 }
 
-// rep
-func (e *EXT2) Rep(name string, path string, path_file_ls string, format string) error {
+func (e *EXT3) Rep(name string, path string, path_file_ls string, format string) error {
 	// Sacar extensión del archivo de salida
 	ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(path), "."))
 	if ext == "" {

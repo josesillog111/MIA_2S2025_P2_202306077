@@ -1,4 +1,4 @@
-package file_ext2
+package file_ext3
 
 import "fmt"
 

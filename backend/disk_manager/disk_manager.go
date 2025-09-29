@@ -353,7 +353,7 @@ func (d *DiskManager) Rmdisk(path string) error {
 	return nil
 }
 
-func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fit string, name string) error {
+func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fit string, delete string, name string, add int64) error {
 
 	// 2. Leer el MBR real
 	mbr, err := d.MbrManager.ReadMBR(path)
@@ -523,6 +523,10 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 	}
 
 	return list, fmt.Errorf("Mount: error: no se encontró una partición con el nombre '%s' en el disco '%s'", name, path)
+}
+
+func (d *DiskManager) Unmount(list MountedPartitionList, id string) error {
+	return nil
 }
 
 func (d *DiskManager) Mounted(list MountedPartitionList) (string, error) {
