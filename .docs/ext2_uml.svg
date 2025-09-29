@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="147cm" height="132cm" viewBox="52 -1094 2931 2633" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="55.3186" y="-680.337" width="1566.29" height="1043.27"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="55.3186" y="-680.337" width="1566.29" height="1043.27"/>
+    <rect style="fill: #ffffff" x="55.3186" y="-700.337" width="40" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="55.3186" y="-700.337" width="40" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="57.3186" y="-685.337">disk</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="53.924" y="428.422" width="2131.44" height="1109.5"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="53.924" y="428.422" width="2131.44" height="1109.5"/>
+    <rect style="fill: #ffffff" x="53.924" y="408.422" width="40" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="53.924" y="408.422" width="40" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="55.924" y="423.422">ext2</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="119.933" y="-397.292" width="225.6" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="119.933" y="-397.292" width="225.6" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="232.733" y="-378.292">MBR</text>
+    <rect style="fill: #ffffff" x="119.933" y="-369.292" width="225.6" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="119.933" y="-369.292" width="225.6" height="84"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122.933" y="-355.292">+Mbr_size: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122.933" y="-339.292">+Mbr_created_date: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122.933" y="-323.292">+Mbr_dsk_signature: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122.933" y="-307.292">+Dsk_fit: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="122.933" y="-291.292">+Mbr_partition: [4]Partition</text>
+    <rect style="fill: #ffffff" x="119.933" y="-285.292" width="225.6" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="119.933" y="-285.292" width="225.6" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="969.648" y="126.433" width="194.8" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="969.648" y="126.433" width="194.8" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1067.05" y="145.433">Partition</text>
+    <rect style="fill: #ffffff" x="969.648" y="154.433" width="194.8" height="132"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="969.648" y="154.433" width="194.8" height="132"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="168.433">+Part_status: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="184.433">+Part_type: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="200.433">+Part_fit: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="216.433">+Part_start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="232.433">+Part_size: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="248.433">+Part_name: [16]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="264.433">+Part_correlative: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="972.648" y="280.433">+Part_id: [4]byte</text>
+    <rect style="fill: #ffffff" x="969.648" y="286.433" width="194.8" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="969.648" y="286.433" width="194.8" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="227.78" y="31.3108" width="164" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="227.78" y="31.3108" width="164" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="309.78" y="50.3108">EBR</text>
+    <rect style="fill: #ffffff" x="227.78" y="59.3108" width="164" height="100"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="227.78" y="59.3108" width="164" height="100"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="73.3108">+Part_mount: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="89.3108">+Part_fit: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="105.311">+Part_start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="121.311">+Part_size: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="137.311">+Part_next: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="230.78" y="153.311">+Part_name: [16]byte</text>
+    <rect style="fill: #ffffff" x="227.78" y="159.311" width="164" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="227.78" y="159.311" width="164" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="104.619" y="800.56" width="217.9" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="104.619" y="800.56" width="217.9" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="213.569" y="819.56">SuperBlock</text>
+    <rect style="fill: #ffffff" x="104.619" y="828.56" width="217.9" height="276"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="104.619" y="828.56" width="217.9" height="276"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="842.56">+S_filesystem_type: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="858.56">+S_inodes_count: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="874.56">+S_blocks_count: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="890.56">+S_free_blocks_count: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="906.56">+S_free_inodes_count: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="922.56">+S_mtime: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="938.56">+S_umtime: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="954.56">+S_mnt_count: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="970.56">+S_magic: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="986.56">+S_inode_s: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1002.56">+S_block_s: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1018.56">+S_firts_ino: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1034.56">+S_first_blo: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1050.56">+S_bm_inode_start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1066.56">+S_bm_block_start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1082.56">+S_inode_start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="107.619" y="1098.56">+S_block_start: int64</text>
+    <rect style="fill: #ffffff" x="104.619" y="1104.56" width="217.9" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="104.619" y="1104.56" width="217.9" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="138.38" y="587.642" width="164" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="138.38" y="587.642" width="164" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="220.38" y="606.642">Block</text>
+    <rect style="fill: #ffffff" x="138.38" y="615.642" width="164" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="138.38" y="615.642" width="164" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="141.38" y="629.642">+B_content: [64]byte</text>
+    <rect style="fill: #ffffff" x="138.38" y="635.642" width="164" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="138.38" y="635.642" width="164" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="164.445" y="1195.7" width="156.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="164.445" y="1195.7" width="156.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="242.595" y="1214.7">Inode</text>
+    <rect style="fill: #ffffff" x="164.445" y="1223.7" width="156.3" height="148"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="164.445" y="1223.7" width="156.3" height="148"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1237.7">+I_uid: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1253.7">+I_gid: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1269.7">+I_s: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1285.7">+I_atime: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1301.7">+I_ctime: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1317.7">+I_mtime: [20]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1333.7">+I_block: [15]int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1349.7">+I_type: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="167.445" y="1365.7">+I_perm: [3]byte</text>
+    <rect style="fill: #ffffff" x="164.445" y="1371.7" width="156.3" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="164.445" y="1371.7" width="156.3" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1593.08" y="651.723" width="179.4" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1593.08" y="651.723" width="179.4" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1682.78" y="670.723">File</text>
+    <rect style="fill: #ffffff" x="1593.08" y="679.723" width="179.4" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1593.08" y="679.723" width="179.4" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1596.08" y="693.723">+B_content: [4]DirEnty</text>
+    <rect style="fill: #ffffff" x="1593.08" y="699.723" width="179.4" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1593.08" y="699.723" width="179.4" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1627.29" y="555.713" width="140.9" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1627.29" y="555.713" width="140.9" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1697.74" y="574.713">DirEntry</text>
+    <rect style="fill: #ffffff" x="1627.29" y="583.713" width="140.9" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1627.29" y="583.713" width="140.9" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1630.29" y="597.713">+B_name: [12]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1630.29" y="613.713">+B_inodo: int64</text>
+    <rect style="fill: #ffffff" x="1627.29" y="619.713" width="140.9" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1627.29" y="619.713" width="140.9" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1679.51" y="-682.897" width="1211.99" height="618.591"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1679.51" y="-682.897" width="1211.99" height="618.591"/>
+    <rect style="fill: #ffffff" x="1679.51" y="-702.897" width="40" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1679.51" y="-702.897" width="40" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1681.51" y="-687.897">main</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1825.47" y="-632.727" width="479.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1825.47" y="-632.727" width="479.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2065.32" y="-613.727">Visitor</text>
+    <rect style="fill: #ffffff" x="1825.47" y="-604.727" width="479.7" height="100"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1825.47" y="-604.727" width="479.7" height="100"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-590.727">+Console: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-574.727">+Errors: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-558.727">+DiskManager: *DiskManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-542.727">+ListMountedPartitions: MountedPartitionList</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-526.727">+IdMountedAndLogued: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-510.727">-BaseGoDiskGrammarVisitor</text>
+    <rect style="fill: #ffffff" x="1825.47" y="-504.727" width="479.7" height="404"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1825.47" y="-504.727" width="479.7" height="404"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-490.727">+Visit(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-474.727">+VisitProg(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-458.727">+VisitMKDISK(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-442.727">+VisitRMDISK(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-426.727">+VisitFDISK(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-410.727">+VisitMOUNT(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-394.727">+VisitMOUNTED(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-378.727">+VisitMKFS(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-362.727">+VisitCAT(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-346.727">+VisitLOGIN(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-330.727">+VisitLOGOUT(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-314.727">+VisitMKGRP(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-298.727">+VisitRMGRP(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-282.727">+VisitMKUSR(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-266.727">+VisitRMUSR(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-250.727">+VisitCHGRP(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-234.727">+VisitMKFILE(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-218.727">+VisitMKDIR(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-202.727">+VisitREP(): interface{}</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-186.727">+NewFileSystem(fsType:string,partitionId:string): FileSystem,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-170.727">                error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-154.727">-extractValue(strLit:antlr.TerminalNode,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-138.727">              unquoted:antlr.TerminalNode): string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-122.727">-cleanQuotes(s:string): string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1828.47" y="-106.727">+extractInt(node:antlr.Tree): int</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2543.63" y="-550.575" width="187.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2543.63" y="-550.575" width="187.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2637.18" y="-531.575">Main</text>
+    <rect style="fill: #ffffff" x="2543.63" y="-522.575" width="187.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2543.63" y="-522.575" width="187.1" height="8"/>
+    <rect style="fill: #ffffff" x="2543.63" y="-514.575" width="187.1" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2543.63" y="-514.575" width="187.1" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2546.63" y="-500.575">+main()</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2546.63" y="-484.575">-runParser(code:string)</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2466.69" y="-338.241" width="341.1" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2466.69" y="-338.241" width="341.1" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2637.24" y="-322.241">&lt;&lt;Interface&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2637.24" y="-303.241">EndPoint</text>
+    <rect style="fill: #ffffff" x="2466.69" y="-294.241" width="341.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2466.69" y="-294.241" width="341.1" height="8"/>
+    <rect style="fill: #ffffff" x="2466.69" y="-286.241" width="341.1" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2466.69" y="-286.241" width="341.1" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2469.69" y="-272.241">+handleExecute(w:ResponseWriter,r:*Request)</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="2305.17,-514.727 2419.9,-514.727 2419.9,-514.575 2535.92,-514.575 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2523.27,-509.575 2539.27,-514.575 2523.27,-519.575 "/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="1117.97,-499.81 1127.97,-509.81 1559.52,-509.81 1559.52,30.2491 1549.52,40.2491 1117.97,40.2491 1117.97,-499.81 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1117.97,-499.81 1127.97,-509.81 1559.52,-509.81 1559.52,30.2491 1549.52,40.2491 1117.97,40.2491 1117.97,-499.81 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1117.97" y1="-499.81" x2="1549.52" y2="-499.81"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1549.52" y1="-499.81" x2="1559.52" y2="-509.81"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1549.52" y1="-499.81" x2="1549.52" y2="40.2491"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1127.97" y="-477.91">
+      <tspan x="1127.97" y="-477.91"></tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="1127.97" y1="-474.91" x2="1127.97" y2="-474.91"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1243.25" y="-189.547" width="168.8" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1243.25" y="-189.547" width="168.8" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1327.65" y="-170.547">MountedPartition</text>
+    <rect style="fill: #ffffff" x="1243.25" y="-161.547" width="168.8" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1243.25" y="-161.547" width="168.8" height="84"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1246.25" y="-147.547">+Path: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1246.25" y="-131.547">+Letter: byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1246.25" y="-115.547">+PartNum: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1246.25" y="-99.5466">+Id: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1246.25" y="-83.5466">+Part: Partition</text>
+    <rect style="fill: #ffffff" x="1243.25" y="-77.5466" width="168.8" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1243.25" y="-77.5466" width="168.8" height="8"/>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="1164.23,-462.738 1278.03,-462.738 1290.03,-450.738 1290.03,-428.738 1164.23,-428.738 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1164.23,-462.738 1278.03,-462.738 1290.03,-450.738 1290.03,-428.738 1164.23,-428.738 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="1278.03,-462.738 1278.03,-450.738 1290.03,-450.738 "/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1171.23" y="-437.838">
+      <tspan x="1171.23" y="-437.838">MEMORY MANAGER</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1191.71" y="-400.723" width="271.8" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1191.71" y="-400.723" width="271.8" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1327.61" y="-381.723">MountedPartitionList</text>
+    <rect style="fill: #ffffff" x="1191.71" y="-372.723" width="271.8" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1191.71" y="-372.723" width="271.8" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1194.71" y="-358.723">+PartitionList: []MountedPartition</text>
+    <rect style="fill: #ffffff" x="1191.71" y="-352.723" width="271.8" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1191.71" y="-352.723" width="271.8" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1194.71" y="-338.723">+GetNextId(): string</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="530.084" y="-27.3094" width="418.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="530.084" y="-27.3094" width="418.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="739.134" y="-8.3094">FreeSpaceManager</text>
+    <rect style="fill: #ffffff" x="530.084" y="0.6906" width="418.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="530.084" y="0.6906" width="418.1" height="8"/>
+    <rect style="fill: #ffffff" x="530.084" y="8.6906" width="418.1" height="100"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="530.084" y="8.6906" width="418.1" height="100"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="22.6906">+getFreeSpace(Mbr:MBR): FreeSpace[]</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="38.6906">+FindFirstFit(size:int64): int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="54.6906">+FindBestFit(size:int64): int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="70.6906">+FindWorstFit(size:int64): int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="86.6906">+GetFreeSpacesInExtended(extended:Partition,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="533.084" y="102.691">                         logicals:[]EBR): []FreeSpace</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="414.9" y="214.87" width="110.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="414.9" y="214.87" width="110.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="469.95" y="233.87">FreeSpace</text>
+    <rect style="fill: #ffffff" x="414.9" y="242.87" width="110.1" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="414.9" y="242.87" width="110.1" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="417.9" y="256.87">+Start: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="417.9" y="272.87">+End: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="417.9" y="288.87">+Size: int64</text>
+    <rect style="fill: #ffffff" x="414.9" y="294.87" width="110.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="414.9" y="294.87" width="110.1" height="8"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="599.567" y="-414.042" width="395" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="599.567" y="-414.042" width="395" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="797.067" y="-395.042">DiskManager</text>
+    <rect style="fill: #ffffff" x="599.567" y="-386.042" width="395" height="52"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="599.567" y="-386.042" width="395" height="52"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-372.042">+FreeSpaceManager: *FreeSpaceManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-356.042">+MbrManager: *MbrManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-340.042">+EbrManager: *EbrManager</text>
+    <rect style="fill: #ffffff" x="599.567" y="-334.042" width="395" height="228"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="599.567" y="-334.042" width="395" height="228"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-320.042">+Mkdisk(path:string,Mbr:MBR): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-304.042">+Rmdisk(path:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-288.042">+Fdisk(path:string,size:int64,unit:byte,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-272.042">       parType:byte,fit:byte,name:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-256.042">+Mount(path:string,name:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-240.042">+Rep(partition:MountedPartition,name:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-224.042">     path:string,id:string,path_file_ls:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-208.042">     format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-192.042">-createPrimary(name:string,size:int64,fit:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-176.042">               path:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-160.042">-createExtended(name:string,size:int64,fit:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-144.042">                path:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-128.042">-createLogical(name:string,size:int64,fit:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="602.567" y="-112.042">               path:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="2637.24,-357.486 2637.24,-416.408 2637.18,-416.408 2637.18,-477.566 "/>
+    <polygon style="fill: #ffffff" points="2629.24,-357.486 2637.24,-341.486 2645.24,-357.486 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2629.24,-357.486 2637.24,-341.486 2645.24,-357.486 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1674.59" y="-17.6205" width="1224.17" height="382.497"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1674.59" y="-17.6205" width="1224.17" height="382.497"/>
+    <rect style="fill: #ffffff" x="1674.59" y="-37.6205" width="81" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1674.59" y="-37.6205" width="81" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1676.59" y="-22.6205">interfaces</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1840.72" y="61.4838" width="448.9" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1840.72" y="61.4838" width="448.9" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2065.17" y="77.4838">&lt;&lt;interface&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2065.17" y="96.4838">FileSystem</text>
+    <rect style="fill: #ffffff" x="1840.72" y="105.484" width="448.9" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1840.72" y="105.484" width="448.9" height="8"/>
+    <rect style="fill: #ffffff" x="1840.72" y="113.484" width="448.9" height="196"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1840.72" y="113.484" width="448.9" height="196"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="127.484">+Mounted(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="143.484">+Mkfs(id:string,typeFor:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="159.484">+Cat(path:string,n:int64): string, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="175.484">+Login(user:string,pass:string,id:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="191.484">+Logout(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="207.484">+Mkgrp(name:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="223.484">+Rmgrp(name :string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="239.484">+Mkusr(user:string,pass:string,grp:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="255.484">+Rmusr(user:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="271.484">+Chgrp(user:string,grp:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="287.484">+Mkfile(path:string,r:bool,size:int64,cont:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1843.72" y="303.484">+Mkdir(path:string,p:bool): error</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="117.128" y="-186.611" width="387.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="117.128" y="-186.611" width="387.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="310.778" y="-167.611">EbrManager</text>
+    <rect style="fill: #ffffff" x="117.128" y="-158.611" width="387.3" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="117.128" y="-158.611" width="387.3" height="8"/>
+    <rect style="fill: #ffffff" x="117.128" y="-150.611" width="387.3" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="117.128" y="-150.611" width="387.3" height="84"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="120.128" y="-136.611">+ReadEbr(path:string,start:int64): EBR, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="120.128" y="-120.611">+WriteEBR(ebr:*EBR,path:string,start:int64): EBR,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="120.128" y="-104.611">           error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="120.128" y="-88.6112">+TraverseEBRs(path:string,start:int64): []EBR,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="120.128" y="-72.6112">               error</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="300.394" y="-572.352" width="302.6" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="300.394" y="-572.352" width="302.6" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="451.694" y="-553.352">MbrManager</text>
+    <rect style="fill: #ffffff" x="300.394" y="-544.352" width="302.6" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="300.394" y="-544.352" width="302.6" height="8"/>
+    <rect style="fill: #ffffff" x="300.394" y="-536.352" width="302.6" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="300.394" y="-536.352" width="302.6" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="303.394" y="-522.352">+ReadMBR(path:string): MBR, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="303.394" y="-506.352">+WriteMBR(Mbr:*MBR,path:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1327.61,-331.715 1327.61,-261.134 1327.65,-261.134 1327.65,-190.554 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1327.63" y="-264.134"></text>
+    <polygon style="fill: #000000" points="1329.63,-264.134 1329.63,-272.134 1337.63,-268.134 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1331.61" y="-319.715"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1331.65" y="-194.554"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="310.778,-65.6038 310.778,-21.6507 309.78,-21.6507 309.78,23.5972 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="304.78,10.9498 309.78,26.9498 314.78,10.9498 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="300.394,-558.352 232.733,-558.352 232.733,-403.997 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="227.733,-416.645 232.733,-400.645 237.733,-416.645 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="530.084,34.6906 469.95,34.6906 469.95,207.159 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="464.95,194.512 469.95,210.512 474.95,194.512 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1557.69" y="832.412" width="464.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1557.69" y="832.412" width="464.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1789.84" y="851.412">EXT2</text>
+    <rect style="fill: #ffffff" x="1557.69" y="860.412" width="464.3" height="116"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1557.69" y="860.412" width="464.3" height="116"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="874.412">+Partition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="890.412">+FileManager: FileManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="906.412">+SBManager: SBManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="922.412">+InodeManager: InodeManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="938.412">+BlockManager: BlockManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="954.412">+DirectoryManager: DirectoryManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="970.412">+LoggedUser: User</text>
+    <rect style="fill: #ffffff" x="1557.69" y="976.412" width="464.3" height="308"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1557.69" y="976.412" width="464.3" height="308"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="990.412">+Mkfs(id:string,typeFor:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1006.41">+Cat(path:string,n:int64): string, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1022.41">+Login(user:string,pass:string,id:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1038.41">+Logout(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1054.41">+Mkgrp(name:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1070.41">+Rmgrp(name :string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1086.41">+Mkusr(user:string,pass:string,grp:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1102.41">+Rmusr(user:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1118.41">+Chgrp(user:string,grp:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1134.41">+Mkfile(path:string,r:bool,size:int64,cont:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1150.41">+Mkdir(path:string,p:bool): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1166.41">-clearPartition(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1182.41">-getUserInfo(username:string): User, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1198.41">-hasPermission(inode:Inode,mode:string): bool</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1214.41">-checkBits(bits:unit16,mode:string): bool</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1230.41">-isLogged(): bool</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1246.41">-isUserRoot(): bool</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1262.41">+Rep(name:string,path:string,id:string,path_file_ls:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1560.69" y="1278.41">     format:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2065.32,-100.727 2065.32,2.21952 2065.17,2.21952 2065.17,60.5187 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2065.25" y="-0.78048"></text>
+    <polygon style="fill: #000000" points="2067.25,-0.78048 2067.25,-8.78048 2075.25,-4.78048 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2069.32" y="-88.7274"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2069.17" y="56.5187"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1053.15" y="1166.31" width="448.9" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1053.15" y="1166.31" width="448.9" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1277.6" y="1185.31">FileManager</text>
+    <rect style="fill: #ffffff" x="1053.15" y="1194.31" width="448.9" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1053.15" y="1194.31" width="448.9" height="84"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1208.31">+Partitition: MountedPartitions</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1224.31">+BlockManager: *BlockManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1240.31">+InodeManager: *InodeManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1256.31">+DirectoryManager: *DirectoryManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1272.31">+SBManager: *SBManager</text>
+    <rect style="fill: #ffffff" x="1053.15" y="1278.31" width="448.9" height="180"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1053.15" y="1278.31" width="448.9" height="180"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1292.31">+CreateFile(parentInodeId:int64,name:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1308.31">            content:[]bytes,owner:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1324.31">            perms:uint16): int64, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1340.31">+ReadFile(inodeId:int64): []byte, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1356.31">+DeleteFile(parentInodeId:int64,name :string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1372.31">+Update(inodeId:int64,newContent:[]byte): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1388.31">-chunkByte(data:[]byte,size:int): [][]byte</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1404.31">-pointerToBytes(p:Pointer): []byte, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1420.31">-readIndirect(blockId:int64,level:int,out:*[]byte): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1436.31">-writeIndirect(inode:Inode,index:int,level:int,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1056.15" y="1452.31">               chunks:[][]byte,chunkIndex:*int): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1243.25,-135.547 1208.35,-135.547 1208.35,210.433 1172.16,210.433 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1184.81,205.433 1168.81,210.433 1184.81,215.433 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1020.75,-260.042 1139.76,-260.042 1139.76,-362.723 1191.71,-362.723 "/>
+    <polygon style="fill: #ffffff" points="995.574,-260.042 1009.57,-264.842 1023.57,-260.042 1009.57,-255.242 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="995.574,-260.042 1009.57,-264.842 1023.57,-260.042 1009.57,-255.242 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1141.76" y="-314.383"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1027.57" y="-263.042">1</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1187.71" y="-365.723">0...*</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="739.134,108.691 739.134,210.433 961.937,210.433 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="949.289,215.433 965.289,210.433 949.289,205.433 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="451.05" y="842.578" width="464.3" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="451.05" y="842.578" width="464.3" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="683.2" y="861.578">SBManager</text>
+    <rect style="fill: #ffffff" x="451.05" y="870.578" width="464.3" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="451.05" y="870.578" width="464.3" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="884.578">+SB: SuperBlock</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="900.578">+Partition: MountedPartition</text>
+    <rect style="fill: #ffffff" x="451.05" y="906.578" width="464.3" height="164"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="451.05" y="906.578" width="464.3" height="164"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="920.578">+ReadSuperBlock(): SuperBlock, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="936.578">+WriteSuperBlock(sb:SuperBlock): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="952.578">+UpdateLastMountedDate(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="968.578">+UpdateLastUnmountedDate(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="984.578">+UpdateMountedCount(): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="1000.58">+ReadSuperBlock(): SuperBlock, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="1016.58">+WriteSuperBlock(block:SuperBlock): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="1032.58">+NewSuperBlock(offset_partition:int64,partition_size:int64,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="1048.58">               file_sys:[10]byte): SuperBlock,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="454.05" y="1064.58">                int64, int64</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="482.384" y="1174.01" width="402.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="482.384" y="1174.01" width="402.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="683.734" y="1193.01">InodeManager</text>
+    <rect style="fill: #ffffff" x="482.384" y="1202.01" width="402.7" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="482.384" y="1202.01" width="402.7" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1216.01">+MountedPartition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1232.01">+SBManager: SBManager</text>
+    <rect style="fill: #ffffff" x="482.384" y="1238.01" width="402.7" height="164"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="482.384" y="1238.01" width="402.7" height="164"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1252.01">+CreateInode(fileType:byte,size:int64,owner:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1268.01">             perms:byte): int64, Inode, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1284.01">+ReadInode(id:int64): Inode, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1300.01">+UpdateInode(id:int64,inode:Inode): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1316.01">+DeleteInode(id:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1332.01">+AllocateInode(): int64, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1348.01">+DeallocateInode(id:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1364.01">+InitInodeBitmap(offset:int64,size:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1380.01">+GetBitmapInode(offset:int64,count:int64): string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="485.384" y="1396.01">                 error</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="481.87" y="517.662" width="402.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="481.87" y="517.662" width="402.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="683.22" y="536.662">BlockManager</text>
+    <rect style="fill: #ffffff" x="481.87" y="545.662" width="402.7" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="481.87" y="545.662" width="402.7" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="559.662">+Partition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="575.662">+SBManager: SBManager</text>
+    <rect style="fill: #ffffff" x="481.87" y="581.662" width="402.7" height="132"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="481.87" y="581.662" width="402.7" height="132"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="595.662">+CreateBlock(data:[]byte): int64, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="611.662">+ReadBlock(id:int64): []byte, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="627.662">+UpdateBlock(id:int64,data:[]byte): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="643.662">+DeleteBlock(id:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="659.662">+AllocateBlock(): int64, error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="675.662">+DeallocateBlock(id:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="691.662">+InitBlockBitmap(offset:int64,count:int64): string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="484.87" y="707.662">                  error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1413.04,-129.547 1515.58,-129.547 1515.58,399.47 1789.84,399.47 1789.84,832.412 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1652.71" y="396.47"></text>
+    <polygon style="fill: #000000" points="1654.71,396.47 1654.71,388.47 1662.71,392.47 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1417.04" y="-132.547"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1793.84" y="828.412"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="994.567,-164.042 1067.05,-164.042 1067.05,118.723 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1062.05,106.075 1067.05,122.075 1072.05,106.075 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1464.52,-366.723 1644.49,-366.723 1644.49,-366.727 1824.47,-366.727 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1646.49" y="-369.725"></text>
+    <polygon style="fill: #000000" points="1648.49,-369.725 1648.49,-377.725 1656.49,-373.725 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1468.52" y="-369.723"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1820.47" y="-369.727"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="481.378,1288.01 405.566,1288.01 405.566,1287.7 328.46,1287.7 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="341.107,1282.7 325.107,1287.7 341.107,1292.7 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="480.864,615.662 396.124,615.662 396.124,615.642 310.09,615.642 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="322.738,610.642 306.738,615.642 322.738,620.642 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="683.734,1173 683.734,1122.29 683.2,1122.29 683.2,1071.59 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="683.467" y="1119.29"></text>
+    <polygon style="fill: #000000" points="685.467,1119.29 685.467,1111.29 693.467,1115.29 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="687.734" y="1169"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="687.2" y="1083.59"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1041.61" y="485.728" width="472" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1041.61" y="485.728" width="472" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1277.61" y="504.728">DirectoryManager</text>
+    <rect style="fill: #ffffff" x="1041.61" y="513.728" width="472" height="68"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1041.61" y="513.728" width="472" height="68"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="527.728">+Partition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="543.728">+SBManager: *SBManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="559.728">+InodeManager: *InodeManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="575.728">+BlockManager: *BlockManager</text>
+    <rect style="fill: #ffffff" x="1041.61" y="581.728" width="472" height="292"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1041.61" y="581.728" width="472" height="292"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="595.728">+CreateDirectory(parentInodeID:int64,name:string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="611.728">                 owner:string,perms:int64): int64,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="627.728">                  error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="643.728">+ReadDirectory(inodeID:int64): []DirEntry,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="659.728">                error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="675.728">+UpdateDirectory(dirInodeID:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="691.728">+DeleteDirectory(dirInodeId:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="707.728">+AddEntry(dirInodeId:int64,name:string,inodeId:int64): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="723.728">+ResolvePath(path:string): int64, string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="739.728">              error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="755.728">+FindEntry(dirInodeID:int64,name:string): int64,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="771.728">            error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="787.728">+ListDirectory(dirInodeId:int64): []string,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="803.728">                error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="819.728">+RemoveEntry(dirInodeId:int64,name:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="835.728">-structToBytes(data:interface{}): []byte,</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="851.728">                error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1044.61" y="867.728">-bytesToStruct(b:[]byte,out:interface{}): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="450.043,956.578 386.784,956.578 386.784,956.56 323.526,956.56 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="388.784" y="953.569"></text>
+    <polygon style="fill: #000000" points="390.784,953.569 390.784,945.569 398.784,949.569 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="446.043" y="953.578"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="327.526" y="953.56"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="574.396,-324.042 451.694,-324.042 451.694,-500.352 "/>
+    <polygon style="fill: #000000" points="599.567,-324.042 585.567,-319.242 571.567,-324.042 585.567,-328.842 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="599.567,-324.042 585.567,-319.242 571.567,-324.042 585.567,-328.842 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="525.631" y="-327.042"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="567.567" y="-327.042"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="455.694" y="-488.352"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="574.396,-196.042 545.5,-196.042 545.5,-126.611 505.434,-126.611 "/>
+    <polygon style="fill: #000000" points="599.567,-196.042 585.567,-191.242 571.567,-196.042 585.567,-200.842 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="599.567,-196.042 585.567,-191.242 571.567,-196.042 585.567,-200.842 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="547.5" y="-164.327"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="567.567" y="-199.042"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="509.434" y="-129.611"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="797.067,-79.861 797.067,-59.6752 739.134,-59.6752 739.134,-28.3178 "/>
+    <polygon style="fill: #000000" points="797.067,-105.033 801.867,-91.0325 797.067,-77.0325 792.267,-91.0325 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="797.067,-105.033 801.867,-91.0325 797.067,-77.0325 792.267,-91.0325 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="768.101" y="-62.6752"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="808.067" y="-93.0325"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="743.134" y="-32.3178"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2408.47" y="29.4286" width="387.3" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2408.47" y="29.4286" width="387.3" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2602.12" y="45.4286">&lt;&lt;interface&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2602.12" y="64.4286">GenerateDiskReport</text>
+    <rect style="fill: #ffffff" x="2408.47" y="73.4286" width="387.3" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2408.47" y="73.4286" width="387.3" height="8"/>
+    <rect style="fill: #ffffff" x="2408.47" y="81.4286" width="387.3" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2408.47" y="81.4286" width="387.3" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2411.47" y="95.4286">+Mbr(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2411.47" y="111.429">+Disk(path:string,id:string,format:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2305.17,-100.727 2305.17,-37.076 2602.12,-37.076 2602.12,29.4286 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2453.65" y="-40.076"></text>
+    <polygon style="fill: #000000" points="2455.65,-40.076 2455.65,-48.076 2463.65,-44.076 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2309.17" y="-88.7274"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2606.12" y="25.4286"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2261.68" y="429.51" width="634.837" height="1107.68"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2261.68" y="429.51" width="634.837" height="1107.68"/>
+    <rect style="fill: #ffffff" x="2261.68" y="409.51" width="81" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2261.68" y="409.51" width="81" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2263.68" y="424.51">report_sys</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2388.29" y="155.492" width="441.2" height="44"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.29" y="155.492" width="441.2" height="44"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2608.89" y="171.492">&lt;&lt;interface&gt;&gt;</text>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2608.89" y="190.492">ReportSysGenerator</text>
+    <rect style="fill: #ffffff" x="2388.29" y="199.492" width="441.2" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.29" y="199.492" width="441.2" height="8"/>
+    <rect style="fill: #ffffff" x="2388.29" y="207.492" width="441.2" height="132"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.29" y="207.492" width="441.2" height="132"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="221.492">+Inode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="237.492">+Block(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="253.492">+BitmapInode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="269.492">+BitmapBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="285.492">+Tree(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="301.492">+SuperBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="317.492">+File(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.29" y="333.492">+Ls(path:string,id:string,format:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="2021.99,966.412 2333.65,966.412 2333.65,247.492 2380.63,247.492 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2367.99,252.492 2383.99,247.492 2367.99,242.492 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2388.26" y="864.401" width="441.2" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.26" y="864.401" width="441.2" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2608.86" y="883.401">ReportSysManager</text>
+    <rect style="fill: #ffffff" x="2388.26" y="892.401" width="441.2" height="100"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.26" y="892.401" width="441.2" height="100"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="906.401">+Partition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="922.401">+SBManager: SBManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="938.401">+FileManager: FileManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="954.401">+InodeManager: InodeManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="970.401">+BlockManager: BlockManager</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="986.401">+DirectoryManger: DirectoryManger</text>
+    <rect style="fill: #ffffff" x="2388.26" y="992.401" width="441.2" height="132"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2388.26" y="992.401" width="441.2" height="132"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1006.4">+Inode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1022.4">+Block(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1038.4">+BitmapInode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1054.4">+BitmapBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1070.4">+Tree(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1086.4">+SuperBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1102.4">+File(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2391.26" y="1118.4">+Ls(path:string,id:string,format:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="2608.89,358.734 2608.89,609.946 2608.86,609.946 2608.86,863.393 "/>
+    <polygon style="fill: #ffffff" points="2616.89,358.734 2608.89,342.734 2600.89,358.734 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2616.89,358.734 2608.89,342.734 2600.89,358.734 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1513.61,591.728 1565.94,591.728 1565.94,591.713 1619.57,591.713 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1606.93,596.713 1622.93,591.713 1606.93,586.713 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1514.61,679.728 1549.35,679.728 1549.35,679.723 1585.37,679.723 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1572.73,684.723 1588.73,679.723 1572.73,674.723 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="683.22,714.668 683.22,778.12 683.2,778.12 683.2,841.571 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="683.21" y="775.12"></text>
+    <polygon style="fill: #000000" points="685.21,775.12 685.21,767.12 693.21,771.12 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="687.22" y="726.668"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="687.2" y="837.571"></text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1643.92" y="1404.2" width="171.7" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1643.92" y="1404.2" width="171.7" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1729.77" y="1423.2">Pointer</text>
+    <rect style="fill: #ffffff" x="1643.92" y="1432.2" width="171.7" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1643.92" y="1432.2" width="171.7" height="20"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1646.92" y="1446.2">+B_pointer: [16]int64</text>
+    <rect style="fill: #ffffff" x="1643.92" y="1452.2" width="171.7" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1643.92" y="1452.2" width="171.7" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1532.52,986.412 1277.61,986.412 1277.61,873.728 "/>
+    <polygon style="fill: #000000" points="1557.69,986.412 1543.69,991.212 1529.69,986.412 1543.69,981.612 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1557.69,986.412 1543.69,991.212 1529.69,986.412 1543.69,981.612 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1417.65" y="983.412"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1525.69" y="983.412"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1281.61" y="885.728"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1532.52,1114.41 1277.6,1114.41 1277.6,1166.31 "/>
+    <polygon style="fill: #000000" points="1557.69,1114.41 1543.69,1119.21 1529.69,1114.41 1543.69,1109.61 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1557.69,1114.41 1543.69,1119.21 1529.69,1114.41 1543.69,1109.61 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1417.64" y="1111.41"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1525.69" y="1111.41"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1281.6" y="1162.31"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1502.05,1432.31 1568.48,1432.31 1568.48,1432.2 1636.21,1432.2 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1623.56,1437.2 1639.56,1432.2 1623.56,1427.2 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1016.43,591.728 956.088,591.728 956.088,591.662 884.57,591.662 "/>
+    <polygon style="fill: #000000" points="1041.61,591.728 1027.61,596.528 1013.61,591.728 1027.61,586.928 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1041.61,591.728 1027.61,596.528 1013.61,591.728 1027.61,586.928 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="958.088" y="588.695"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1009.61" y="588.728"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="888.57" y="588.662"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1016.43,751.728 956.345,751.728 956.345,1248.01 885.084,1248.01 "/>
+    <polygon style="fill: #000000" points="1041.61,751.728 1027.61,756.528 1013.61,751.728 1027.61,746.928 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1041.61,751.728 1027.61,756.528 1013.61,751.728 1027.61,746.928 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="958.345" y="996.867"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1009.61" y="748.728"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="889.084" y="1245.01"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1027.98,1252.31 993.104,1252.31 993.104,615.662 885.569,615.662 "/>
+    <polygon style="fill: #000000" points="1053.15,1252.31 1039.15,1257.11 1025.15,1252.31 1039.15,1247.51 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1053.15,1252.31 1039.15,1257.11 1025.15,1252.31 1039.15,1247.51 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="995.104" y="930.987"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1021.15" y="1249.31"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="889.569" y="612.662"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1027.98,1288.31 962.62,1288.31 962.62,1288.01 886.09,1288.01 "/>
+    <polygon style="fill: #000000" points="1053.15,1288.31 1039.15,1293.11 1025.15,1288.31 1039.15,1283.51 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1053.15,1288.31 1039.15,1293.11 1025.15,1288.31 1039.15,1283.51 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="964.62" y="1285.16"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="1021.15" y="1285.31"></text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="890.09" y="1285.01"></text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="2065.17,327.72 2065.17,902.412 2021.99,902.412 "/>
+    <polygon style="fill: #ffffff" points="2073.17,327.72 2065.17,311.72 2057.17,327.72 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2073.17,327.72 2065.17,311.72 2057.17,327.72 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2047.16,1018.41 2212.13,1018.41 2212.13,1018.4 2388.26,1018.4 "/>
+    <polygon style="fill: #000000" points="2021.99,1018.41 2035.99,1013.61 2049.99,1018.41 2035.99,1023.21 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2021.99,1018.41 2035.99,1013.61 2049.99,1018.41 2035.99,1023.21 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1674.5" y="-1072.35" width="1213.53" height="332.991"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1674.5" y="-1072.35" width="1213.53" height="332.991"/>
+    <rect style="fill: #ffffff" x="1674.5" y="-1092.35" width="88.7" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1674.5" y="-1092.35" width="88.7" height="20"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1676.5" y="-1077.35">report_disk</text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="2061.96" y="-1011.93" width="441.2" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2061.96" y="-1011.93" width="441.2" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="2282.56" y="-992.935">ReportDiskManager</text>
+    <rect style="fill: #ffffff" x="2061.96" y="-983.935" width="441.2" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2061.96" y="-983.935" width="441.2" height="36"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-969.935">+Partition: MountedPartition</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-953.935">+DiskManager: DiskManager</text>
+    <rect style="fill: #ffffff" x="2061.96" y="-947.935" width="441.2" height="164"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="2061.96" y="-947.935" width="441.2" height="164"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-933.935">+Mbr(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-917.935">+Disk(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-901.935">+Inode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-885.935">+Block(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-869.935">+BitmapInode(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-853.935">+BitmapBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-837.935">+Tree(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-821.935">+SuperBlock(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-805.935">+File(path:string,id:string,format:string): error</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="2064.96" y="-789.935">+Ls(path:string,id:string,format:string): error</text>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2847.73,265.492 2866.49,265.492 2866.49,-921.935 2503.16,-921.935 "/>
+    <polygon style="fill: #ffffff" points="2847.73,257.492 2831.73,265.492 2847.73,273.492 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2847.73,257.492 2831.73,265.492 2847.73,273.492 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="994.567,-439.214 994.567,-712.337 2282.56,-712.337 2282.56,-782.978 "/>
+    <polygon style="fill: #000000" points="994.567,-414.042 989.767,-428.042 994.567,-442.042 999.367,-428.042 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="994.567,-414.042 989.767,-428.042 994.567,-442.042 999.367,-428.042 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1881" y="1358.18" width="110.1" height="28"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1881" y="1358.18" width="110.1" height="28"/>
+    <text font-size="16" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1936.05" y="1377.18">User</text>
+    <rect style="fill: #ffffff" x="1881" y="1386.18" width="110.1" height="84"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1881" y="1386.18" width="110.1" height="84"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1884" y="1400.18">+I_uid: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1884" y="1416.18">+I_gid: int64</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1884" y="1432.18">+Name: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1884" y="1448.18">+Pass: string</text>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1884" y="1464.18">+Grp: string</text>
+    <rect style="fill: #ffffff" x="1881" y="1470.18" width="110.1" height="8"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1881" y="1470.18" width="110.1" height="8"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1789.84,1284.41 1789.84,1316.79 1936.05,1316.79 1936.05,1350.47 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1931.05,1337.82 1936.05,1353.82 1941.05,1337.82 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="797.067,-414.042 797.067,-562.727 1825.47,-562.727 "/>
+    <polygon style="fill: #000000" points="1313.27,-562.727 1313.27,-570.727 1321.27,-566.727 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="2808.8,-302.241 2887.15,-302.241 2887.15,-301.884 2949.49,-301.884 "/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 2957.49,-309.884 A 8,8 0 1 0 2957.49,-293.884"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="2809.55" y="-335.702">
+      <tspan x="2809.55" y="-335.702"></tspan>
+    </text>
+  </g>
+</svg>

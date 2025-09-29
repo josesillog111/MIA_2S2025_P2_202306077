@@ -1,0 +1,28 @@
+/* src/components/Console.css */
+.console-container {
+    background-color: #0c0c0c; /* Un color de fondo más oscuro para diferenciarlo del editor */
+    color: #ffffff;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    border-left: 1px solid #3c3c3c;
+}
+
+.console-header {
+    background-color: #252526;
+    padding: 8px 15px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #808080;
+    text-transform: uppercase;
+    border-bottom: 1px solid #3c3c3c;
+}
+
+.console-output {
+    flex: 1;
+    padding: 10px 15px;
+    margin: 0;
+    white-space: pre-wrap; /* Mantiene los saltos de línea y el formato */
+    overflow-y: auto; /* Permite el scroll si el contenido es muy largo */
+}

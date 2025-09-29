@@ -1,0 +1,64 @@
+/* src/components/Ribbon.css */
+:root {
+  --vscode-bg-ribbon: #252526;
+  --vscode-text: #cccccc;
+  --vscode-border: #3c3c3c;
+  --vscode-dropdown-bg: #2d2d2d;
+  --vscode-item-hover: #37373d;
+}
+
+.ribbon {
+  background-color: var(--vscode-bg-ribbon);
+  border-bottom: 1px solid var(--vscode-border);
+  padding: 0 10px;
+}
+
+.ribbon-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-size: 13px;
+  position: relative;
+}
+
+.ribbon-item {
+  position: relative;
+  padding: 5px 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ribbon-item:hover {
+  background-color: var(--vscode-item-hover);
+}
+
+.ribbon-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--vscode-dropdown-bg);
+  min-width: 200px;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--vscode-border);
+  z-index: 1000;
+}
+
+.ribbon-menu-item {
+  padding: 6px 15px;
+  cursor: pointer;
+}
+
+.ribbon-menu-item:hover {
+  background-color: var(--vscode-item-hover);
+}
+
+.ribbon-menu-item.separator {
+  height: 1px;
+  background-color: var(--vscode-border);
+  margin: 5px 0;
+  padding: 0;
+}

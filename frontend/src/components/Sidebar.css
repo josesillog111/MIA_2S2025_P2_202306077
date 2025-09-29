@@ -1,0 +1,143 @@
+/* src/App.css o src/components/Sidebar.css */
+
+.sidebar-actions {
+  padding: 10px;
+  border-bottom: 1px solid var(--vscode-border);
+}
+
+.run-button-sidebar {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--vscode-active-item);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.run-button-sidebar:hover {
+  background-color: #0060a0;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo más oscuro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  font-family: 'Segoe UI', Arial, sans-serif; /* Fuente similar a VS Code */
+}
+
+.popup-content {
+  background-color: #2D2D2D; /* Fondo más oscuro */
+  color: #CCCCCC; /* Texto claro */
+  padding: 15px 20px 10px 20px; /* Ajuste de padding */
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+  width: 400px; /* Ancho fijo como en la imagen */
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+  padding-right: 30px; /* Espacio para el botón de cerrar */
+}
+
+.popup-icon {
+  font-size: 20px; /* Tamaño del icono */
+  margin-right: 10px;
+  color: #E44D26; /* Color rojo para el icono (o el que desees) */
+}
+
+.popup-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: normal;
+  color: #FFFFFF; /* Título blanco */
+}
+
+.popup-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: #CCCCCC;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+.popup-close-button:hover {
+  color: #FFFFFF;
+}
+
+.popup-message {
+  font-size: 15px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 10px; /* Espacio entre botones */
+}
+
+.popup-buttons button {
+  padding: 8px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.popup-confirm-button {
+  background-color: #007ACC; /* Botón de acción principal */
+  color: white;
+  border: none;
+}
+
+.popup-confirm-button:hover {
+  background-color: #0060A0;
+}
+
+.popup-cancel-button {
+  background-color: #444444; /* Botón secundario */
+  color: white;
+  border: 1px solid #555555;
+}
+
+.popup-cancel-button:hover {
+  background-color: #555555;
+  border-color: #666666;
+}
+
+.popup-source {
+  margin-top: 15px;
+  font-size: 11px;
+  color: #888888;
+  border-top: 1px solid #444444; /* Línea separadora */
+  padding-top: 10px;
+}
+
+.popup-icon {
+  width: 15px; /* Tamaño del SVG */
+  height: 15px;
+  fill: #E44D26; /* Cambia el color del SVG si está configurado para `fill` */
+  margin-right: 10px;
+}
