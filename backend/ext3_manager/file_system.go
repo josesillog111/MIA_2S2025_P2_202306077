@@ -8,7 +8,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"time"
 )
 
 const (
@@ -24,6 +26,14 @@ type EXT3 struct {
 	BlockManager     BlockManager
 	DirectoryManager DirectoryManager
 	LoggedUser       file.User // usuario actualmente logueado
+}
+
+func wildcardToRegex(pattern string) string {
+	// Escapar caracteres especiales excepto * y ?
+	rePattern := regexp.QuoteMeta(pattern)
+	rePattern = strings.ReplaceAll(rePattern, `\*`, ".*") // * → uno o más caracteres
+	rePattern = strings.ReplaceAll(rePattern, `\?`, ".")  // ? → un carácter
+	return "^" + rePattern + "$"
 }
 
 func NewEXT3(partition dmanager.MountedPartition) *EXT3 {
@@ -148,6 +158,215 @@ func (e *EXT3) isUserRoot() bool {
 	return e.LoggedUser.Name == "root"
 }
 
+func (e *EXT3) findRecursive(dirInodeID int64, currentPath string, re *regexp.Regexp, out *strings.Builder, indent int) error {
+	dirInode, err := e.InodeManager.ReadInode(dirInodeID)
+	if err != nil {
+		return fmt.Errorf("FindRecursive: Error leyendo inodo %d: %v", dirInodeID, err)
+	}
+
+	// Verificar permiso de lectura
+	if !e.hasPermission(dirInode, "r") {
+		return nil // simplemente omitir carpeta sin permiso
+	}
+
+	entries, err := e.DirectoryManager.ReadDirectory(dirInodeID)
+	if err != nil {
+		return fmt.Errorf("FindRecursive: Error leyendo contenido de '%s': %v", currentPath, err)
+	}
+
+	for _, entry := range entries {
+		if entry.B_inodo == -1 {
+			continue
+		}
+		name := strings.Trim(string(entry.B_name[:]), "\x00")
+		if name == "" || name == "." || name == ".." {
+			continue
+		}
+
+		childInode, err := e.InodeManager.ReadInode(entry.B_inodo)
+		if err != nil {
+			continue
+		}
+
+		// Si el nombre cumple con el patrón → agregar al árbol
+		if re.MatchString(name) {
+			out.WriteString(strings.Repeat(" ", indent*2))
+			out.WriteString("|_ ")
+			out.WriteString(name)
+			out.WriteString("\n")
+		}
+
+		// Si es carpeta → buscar recursivamente
+		if childInode.I_type == DIR_TYPE {
+			out.WriteString(strings.Repeat(" ", indent*2))
+			out.WriteString("|_ ")
+			out.WriteString(name)
+			out.WriteString("\n")
+			e.findRecursive(entry.B_inodo, path.Join(currentPath, name), re, out, indent+1)
+		}
+	}
+	return nil
+}
+
+func (e *EXT3) chownRecursive(inodeID int64, newUID int64) error {
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("ChownRecursive: Error leyendo inodo: %v", err)
+	}
+
+	inode.I_uid = newUID
+	if err := e.InodeManager.UpdateInode(inodeID, inode); err != nil {
+		return fmt.Errorf("ChownRecursive: Error actualizando inodo: %v", err)
+	}
+
+	if inode.I_type != DIR_TYPE {
+		return nil
+	}
+
+	entries, err := e.DirectoryManager.ReadDirectory(inodeID)
+	if err != nil {
+		return fmt.Errorf("ChownRecursive: Error leyendo directorio: %v", err)
+	}
+
+	for _, entry := range entries {
+		if entry.B_inodo == -1 {
+			continue
+		}
+		name := strings.Trim(string(entry.B_name[:]), "\x00")
+		if name == "" || name == "." || name == ".." {
+			continue
+		}
+		e.chownRecursive(entry.B_inodo, newUID)
+	}
+
+	return nil
+}
+
+func (e *EXT3) chmodRecursive(inodeID int64, ugo uint16, isRoot bool) error {
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("ChmodRecursive: Error leyendo inodo: %v", err)
+	}
+
+	// Solo root puede modificar cualquier cosa, los demás solo sus archivos
+	if isRoot || inode.I_uid == e.LoggedUser.I_uid {
+		inode.I_permissions = ugo
+		if err := e.InodeManager.UpdateInode(inodeID, inode); err != nil {
+			return fmt.Errorf("ChmodRecursive: Error actualizando inodo: %v", err)
+		}
+	}
+
+	if inode.I_type != DIR_TYPE {
+		return nil
+	}
+
+	entries, err := e.DirectoryManager.ReadDirectory(inodeID)
+	if err != nil {
+		return fmt.Errorf("ChmodRecursive: Error leyendo directorio: %v", err)
+	}
+
+	for _, entry := range entries {
+		if entry.B_inodo == -1 {
+			continue
+		}
+		name := strings.Trim(string(entry.B_name[:]), "\x00")
+		if name == "" || name == "." || name == ".." {
+			continue
+		}
+		e.chmodRecursive(entry.B_inodo, ugo, isRoot)
+	}
+
+	return nil
+}
+
+/*
+func (e *EXT3) copyFile(srcInodeID int64, destParentID int64, fileName string) error {
+	// Leer archivo fuente
+	srcInode, err := e.InodeManager.ReadInode(srcInodeID)
+	if err != nil {
+		return fmt.Errorf("CopyFile: Error leyendo inodo fuente: %v", err)
+	}
+	if !e.hasPermission(srcInode, "r") {
+		return fmt.Errorf("CopyFile: Sin permiso de lectura en '%s'", fileName)
+	}
+
+	content, err := e.FileManager.ReadFileContent(srcInodeID)
+	if err != nil {
+		return fmt.Errorf("CopyFile: Error leyendo contenido de '%s': %v", fileName, err)
+	}
+
+	// Crear nuevo archivo en el destino
+	if err := e.FileManager.CreateFile(destParentID, fileName, e.LoggedUser.UID, e.LoggedUser.GID, content); err != nil {
+		return fmt.Errorf("CopyFile: Error creando archivo '%s' en destino: %v", fileName, err)
+	}
+
+	return nil
+}
+
+
+func (e *EXT3) copyDirectory(srcDirID int64, destParentID int64, dirName string) error {
+	srcInode, err := e.InodeManager.ReadInode(srcDirID)
+	if err != nil {
+		return fmt.Errorf("CopyDir: Error leyendo inodo directorio: %v", err)
+	}
+	if !e.hasPermission(srcInode, "r") {
+		return fmt.Errorf("CopyDir: Sin permiso de lectura en carpeta '%s'", dirName)
+	}
+
+	// Crear carpeta destino
+	//newDirID, err := e.DirectoryManager.CreateDirectory(destParentID, dirName, e.LoggedUser.Name, e.LoggedUser.GID)
+	if err != nil {
+		return fmt.Errorf("CopyDir: Error creando carpeta '%s': %v", dirName, err)
+	}
+
+		// Leer contenido del directorio fuente
+		entries, err := e.DirectoryManager.ReadDirectory(srcDirID)
+		if err != nil {
+			return fmt.Errorf("CopyDir: Error leyendo contenido de '%s': %v", dirName, err)
+		}
+
+		// Recorrer contenido
+
+			for _, entry := range entries {
+
+					if entry.B_inodo == -1 {
+						continue
+					}
+					name := strings.Trim(string(entry.B_name[:]), "\x00")
+					childInode, err := e.InodeManager.ReadInode(entry.B_inodo)
+					if err != nil {
+						fmt.Printf("CopyDir: Error leyendo inodo de '%s': %v\n", name, err)
+						continue
+					}
+
+						// Copiar recursivamente
+						if childInode.I_type == FILE_TYPE {
+							if e.hasPermission(childInode, "r") {
+
+									if err := e.copyFile(entry.B_inodo, newDirID, name); err != nil {
+										fmt.Printf("CopyDir: Error copiando archivo '%s': %v\n", name, err)
+									}
+
+							} else {
+								fmt.Printf("CopyDir: Sin permiso para copiar '%s'\n", name)
+							}
+						} else if childInode.I_type == DIR_TYPE {
+							if e.hasPermission(childInode, "r") {
+								if err := e.copyDirectory(entry.B_inodo, newDirID, name); err != nil {
+									fmt.Printf("CopyDir: Error copiando subcarpeta '%s': %v\n", name, err)
+								}
+							} else {
+								fmt.Printf("CopyDir: Sin permiso para copiar subcarpeta '%s'\n", name)
+							}
+						}
+
+			}
+
+
+	return nil
+}
+*/
+
 /*
 
 	Implementación de FileSystem Interface
@@ -166,7 +385,7 @@ func (e *EXT3) Mkfs(id string, typeFormat string) error {
 	sb, _, _ := e.SBManager.NewSuperBlock(
 		e.Partition.Partition.Part_start,
 		e.Partition.Partition.Part_size,
-		[10]byte{'E', 'X', 'T', '2', 0, 0, 0, 0, 0, 0},
+		[10]byte{'E', 'X', 'T', '3', 0, 0, 0, 0, 0, 0},
 	)
 	e.SBManager.SB = *sb
 	if err := e.SBManager.WriteSuperBlock(*sb); err != nil {
@@ -656,12 +875,17 @@ func (e *EXT3) Mkfile(virtualPath string, recursive bool, size int64, content st
 	// --- Preparar contenido ---
 	var contentBytes []byte
 	if content != "" {
-		// Cargar desde archivo externo
-		data, err := os.ReadFile(content)
-		if err != nil {
-			return fmt.Errorf("Mkfile: Error leyendo archivo externo '%s': %v", content, err)
+		if info, err := os.Stat(content); err == nil && !info.IsDir() {
+			// Es un archivo real → leer su contenido
+			data, err := os.ReadFile(content)
+			if err != nil {
+				return fmt.Errorf("Mkfile: Error leyendo archivo externo '%s': %v", content, err)
+			}
+			contentBytes = data
+		} else {
+			// No existe como archivo → tratarlo como texto literal
+			contentBytes = []byte(content)
 		}
-		contentBytes = data
 	} else {
 		if size < 0 {
 			return fmt.Errorf("Mkfile: Tamaño inválido (%d)", size)
@@ -847,63 +1071,356 @@ func (e *EXT3) Mkdir(virtualPath string, p bool) error {
 	return nil
 }
 
-func (e *EXT3) Remove(path string) error {
-	fmt.Println("1) Remove: No implementado")
-	fmt.Println("path:", path)
+// ls
+func (e *EXT3) List(virtualPath string) ([]map[string]interface{}, error) {
+	if !e.isLogged() {
+		return nil, fmt.Errorf("List: No hay ningún usuario logueado")
+	}
+
+	// Normalizar la ruta (evita dobles / y limpia . y ..)
+	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
+
+	// Resolver el path (obtiene inodo padre y nombre del directorio)
+	parentID, name, err := e.DirectoryManager.ResolvePath(virtualPath)
+	if err != nil {
+		return nil, fmt.Errorf("List: no se pudo resolver la ruta '%s': %v", virtualPath, err)
+	}
+
+	// Determinar el inodo del directorio destino
+	dirID := parentID
+	if name != "" && name != "/" {
+		dirID, err = e.DirectoryManager.FindEntry(parentID, name)
+		if err != nil {
+			return nil, fmt.Errorf("List: el directorio '%s' no existe", virtualPath)
+		}
+	}
+
+	// Leer las entradas del directorio
+	entries, err := e.DirectoryManager.ReadDirectory(dirID)
+	if err != nil {
+		return nil, fmt.Errorf("List: error leyendo el directorio '%s': %v", virtualPath, err)
+	}
+
+	// Construir resultado
+	var result []map[string]interface{}
+
+	for _, entry := range entries {
+		entryName := strings.Trim(string(entry.B_name[:]), "\x00")
+
+		// Leer el inodo del elemento
+		inode, err := e.InodeManager.ReadInode(entry.B_inodo)
+		if err != nil {
+			return nil, fmt.Errorf("List: error leyendo inodo de '%s': %v", entryName, err)
+		}
+
+		// Determinar tipo
+		entryType := "file"
+		if inode.I_type == DIR_TYPE {
+			entryType = "dir"
+		}
+
+		result = append(result, map[string]interface{}{
+			"name":  entryName,
+			"type":  entryType,
+			"size":  inode.I_size,
+			"owner": inode.I_uid,
+			"perm":  fmt.Sprintf("%03o", inode.I_permissions),
+			"time":  inode.I_mtime,
+		})
+	}
+
+	return result, nil
+}
+
+// remove
+func (e *EXT3) Remove(virtualPath string) error {
+	if !e.isLogged() {
+		return fmt.Errorf("Remove: No hay ningún usuario logueado")
+	}
+
+	// Normalizar la ruta
+	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
+	if virtualPath == "/" {
+		return fmt.Errorf("Remove: No se puede eliminar el directorio raíz '/'")
+	}
+
+	// Resolver ruta padre y nombre del elemento
+	parentID, name, err := e.DirectoryManager.ResolvePath(virtualPath)
+	if err != nil {
+		return fmt.Errorf("Remove: Ruta no encontrada '%s'", virtualPath)
+	}
+
+	// Buscar inodo destino
+	inodeID, err := e.DirectoryManager.FindEntry(parentID, name)
+	if err != nil {
+		return fmt.Errorf("Remove: No existe '%s'", virtualPath)
+	}
+
+	// Leer inodo
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("Remove: Error leyendo inodo %d: %v", inodeID, err)
+	}
+
+	// Verificar permiso de escritura
+	if !e.hasPermission(inode, "w") {
+		return fmt.Errorf("Remove: Permiso denegado para eliminar '%s'", virtualPath)
+	}
+
+	// --- Si es archivo ---
+	if inode.I_type == FILE_TYPE {
+		if err := e.FileManager.DeleteFile(parentID, name); err != nil {
+			return fmt.Errorf("Remove: Error eliminando archivo '%s': %v", name, err)
+		}
+		return nil
+	}
+
+	// --- Si es directorio ---
+	if inode.I_type == DIR_TYPE {
+		if err := e.removeRecursive(inodeID); err != nil {
+			return fmt.Errorf("Remove: %v", err)
+		}
+
+		// Finalmente eliminar la entrada del directorio padre
+		if err := e.DirectoryManager.DeleteEntry(parentID, name); err != nil {
+			return fmt.Errorf("Remove: Error eliminando entrada de '%s': %v", name, err)
+		}
+	}
 
 	return nil
 }
 
-func (e *EXT3) Edit(path string, contenido string) error {
-	fmt.Println("2) Edit: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("contenido:", contenido)
+// edit
+func (e *EXT3) Edit(virtualPath string, contenidoPath string) error {
+	if !e.isLogged() {
+		return fmt.Errorf("Edit: No hay ningún usuario logueado")
+	}
+
+	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
+
+	parentID, name, err := e.DirectoryManager.ResolvePath(virtualPath)
+	if err != nil {
+		return fmt.Errorf("Edit: No se pudo resolver la ruta '%s': %v", virtualPath, err)
+	}
+
+	fileID, err := e.DirectoryManager.FindEntry(parentID, name)
+	if err != nil {
+		return fmt.Errorf("Edit: El archivo '%s' no existe", virtualPath)
+	}
+
+	inode, err := e.InodeManager.ReadInode(fileID)
+	if err != nil {
+		return fmt.Errorf("Edit: Error leyendo inodo del archivo '%s': %v", virtualPath, err)
+	}
+
+	if !e.hasPermission(inode, "r") || !e.hasPermission(inode, "w") {
+		return fmt.Errorf("Edit: Permiso denegado para editar '%s'", virtualPath)
+	}
+
+	data, err := os.ReadFile(contenidoPath)
+	if err != nil {
+		return fmt.Errorf("Edit: Error leyendo el archivo externo '%s': %v", contenidoPath, err)
+	}
+
+	if err := e.FileManager.UpdateFile(fileID, data); err != nil {
+		return fmt.Errorf("Edit: Error actualizando contenido de '%s': %v", virtualPath, err)
+	}
+
+	inode.I_mtime = time.Now().Unix()
+	inode.I_size = int64(len(data))
+	if err := e.InodeManager.UpdateInode(fileID, inode); err != nil {
+		return fmt.Errorf("Edit: Error actualizando metadatos del archivo: %v", err)
+	}
 
 	return nil
 }
 
-func (e *EXT3) Rename(path string, name string) error {
-	fmt.Println("3) Rename: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("name:", name)
+// rename
+func (e *EXT3) Rename(virtualPath string, newName string) error {
+	if !e.isLogged() {
+		return fmt.Errorf("Rename: No hay ningún usuario logueado")
+	}
+
+	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
+
+	parentID, oldName, err := e.DirectoryManager.ResolvePath(virtualPath)
+	if err != nil {
+		return fmt.Errorf("Rename: No se pudo resolver la ruta '%s': %v", virtualPath, err)
+	}
+
+	inodeID, err := e.DirectoryManager.FindEntry(parentID, oldName)
+	if err != nil {
+		return fmt.Errorf("Rename: No existe '%s'", virtualPath)
+	}
+
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("Rename: Error leyendo inodo: %v", err)
+	}
+
+	if !e.hasPermission(inode, "w") {
+		return fmt.Errorf("Rename: Permiso denegado para renombrar '%s'", oldName)
+	}
+
+	if _, err := e.DirectoryManager.FindEntry(parentID, newName); err == nil {
+		return fmt.Errorf("Rename: Ya existe un archivo o carpeta con el nombre '%s'", newName)
+	}
+
+	if err := e.DirectoryManager.RenameEntry(parentID, oldName, newName); err != nil {
+		return fmt.Errorf("Rename: Error renombrando entrada: %v", err)
+	}
 
 	return nil
 }
 
-func (e *EXT3) Copy(path string, dest string) error {
+func (e *EXT3) Copy(srcPath string, destPath string) error {
 	fmt.Println("4) Copy: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("dest:", dest)
+	fmt.Println("src:", srcPath)
+	fmt.Println("dest:", destPath)
 	return nil
 }
 
-func (e *EXT3) Move(path string, dest string) error {
+func (e *EXT3) Move(srcPath string, destPath string) error {
 	fmt.Println("5) Move: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("dest:", dest)
+	fmt.Println("src:", srcPath)
+	fmt.Println("dest:", destPath)
 	return nil
 }
 
-func (e *EXT3) Find(path string, name string) (string, error) {
-	fmt.Println("6) Find: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("name:", name)
-	return "no implementado", nil
+func (e *EXT3) Find(startPath string, pattern string) (string, error) {
+	if !e.isLogged() {
+		return "", fmt.Errorf("Find: No hay ningún usuario logueado")
+	}
+
+	startPath = path.Clean("/" + strings.Trim(startPath, "/"))
+
+	parentID, name, err := e.DirectoryManager.ResolvePath(startPath)
+	if err != nil {
+		return "", fmt.Errorf("Find: Ruta no encontrada '%s'", startPath)
+	}
+
+	var startInodeID int64
+	if startPath == "/" {
+		// Si es raíz, el inodo es el root
+		startInodeID = e.SBManager.SB.S_inode_start
+	} else {
+		startInodeID, err = e.DirectoryManager.FindEntry(parentID, name)
+		if err != nil {
+			return "", fmt.Errorf("Find: No existe la carpeta '%s'", startPath)
+		}
+	}
+
+	startInode, err := e.InodeManager.ReadInode(startInodeID)
+	if err != nil {
+		return "", fmt.Errorf("Find: Error leyendo inodo de '%s': %v", startPath, err)
+	}
+
+	if startInode.I_type != DIR_TYPE {
+		return "", fmt.Errorf("Find: '%s' no es una carpeta", startPath)
+	}
+
+	if !e.hasPermission(startInode, "r") {
+		return "", fmt.Errorf("Find: Permiso denegado para leer '%s'", startPath)
+	}
+
+	regexPattern := wildcardToRegex(pattern)
+	re, err := regexp.Compile(regexPattern)
+	if err != nil {
+		return "", fmt.Errorf("Find: Patrón inválido '%s'", pattern)
+	}
+
+	builder := &strings.Builder{}
+	builder.WriteString("/\n")
+	if err := e.findRecursive(startInodeID, "/", re, builder, 1); err != nil {
+		return "", err
+	}
+
+	return builder.String(), nil
 }
 
-func (e *EXT3) Chown(path string, user string, recursive bool) error {
-	fmt.Println("7) Chown: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("user:", user)
-	fmt.Println("recursive:", recursive)
+func (e *EXT3) Chown(startPath string, username string, recursive bool) error {
+	if !e.isLogged() {
+		return fmt.Errorf("Chown: No hay usuario logueado")
+	}
+
+	startPath = path.Clean("/" + strings.Trim(startPath, "/"))
+
+	parentID, name, err := e.DirectoryManager.ResolvePath(startPath)
+	if err != nil {
+		return fmt.Errorf("Chown: Ruta no encontrada '%s'", startPath)
+	}
+	inodeID, err := e.DirectoryManager.FindEntry(parentID, name)
+	if err != nil {
+		return fmt.Errorf("Chown: No existe '%s'", startPath)
+	}
+
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("Chown: Error leyendo inodo: %v", err)
+	}
+
+	if e.LoggedUser.Name != "root" && inode.I_uid != e.LoggedUser.I_uid {
+		return fmt.Errorf("Chown: Permiso denegado. Solo root o el propietario puede cambiar dueño de '%s'", startPath)
+	}
+
+	newUser, err := e.getUserInfo(username)
+	if err != nil {
+		return fmt.Errorf("Chown: El usuario '%s' no existe", username)
+	}
+
+	if recursive && inode.I_type == DIR_TYPE {
+		if err := e.chownRecursive(inodeID, newUser.I_uid); err != nil {
+			return err
+		}
+	} else {
+		inode.I_uid = newUser.I_uid
+		if err := e.InodeManager.UpdateInode(inodeID, inode); err != nil {
+			return fmt.Errorf("Chown: Error actualizando inodo: %v", err)
+		}
+	}
+
 	return nil
 }
 
-func (e *EXT3) Chmod(path string, ugo int64, recursive bool) error {
-	fmt.Println("8) Chmod: No implementado")
-	fmt.Println("path:", path)
-	fmt.Println("ugo:", ugo)
-	fmt.Println("recursive:", recursive)
+func (e *EXT3) Chmod(startPath string, ugo uint16, recursive bool) error {
+	if !e.isLogged() {
+		return fmt.Errorf("Chmod: No hay usuario logueado")
+	}
+
+	if ugo > 0777 {
+		return fmt.Errorf("Chmod: Permisos inválidos '%d', deben estar en rango 000–777", ugo)
+	}
+
+	startPath = path.Clean("/" + strings.Trim(startPath, "/"))
+
+	parentID, name, err := e.DirectoryManager.ResolvePath(startPath)
+	if err != nil {
+		return fmt.Errorf("Chmod: Ruta no encontrada '%s'", startPath)
+	}
+	inodeID, err := e.DirectoryManager.FindEntry(parentID, name)
+	if err != nil {
+		return fmt.Errorf("Chmod: No existe '%s'", startPath)
+	}
+
+	inode, err := e.InodeManager.ReadInode(inodeID)
+	if err != nil {
+		return fmt.Errorf("Chmod: Error leyendo inodo: %v", err)
+	}
+
+	if e.LoggedUser.Name != "root" && inode.I_uid != e.LoggedUser.I_uid {
+		return fmt.Errorf("Chmod: Permiso denegado. Solo root o el propietario puede cambiar permisos de '%s'", startPath)
+	}
+
+	if recursive && inode.I_type == DIR_TYPE {
+		if err := e.chmodRecursive(inodeID, ugo, e.LoggedUser.Name == "root"); err != nil {
+			return err
+		}
+	} else {
+		inode.I_permissions = ugo
+		if err := e.InodeManager.UpdateInode(inodeID, inode); err != nil {
+			return fmt.Errorf("Chmod: Error actualizando permisos: %v", err)
+		}
+	}
 
 	return nil
 }

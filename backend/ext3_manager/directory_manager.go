@@ -41,6 +41,48 @@ func (dm *DirectoryManager) bytesToStruct(b []byte, out interface{}) error {
 	return nil
 }
 
+func (e *EXT3) removeRecursive(dirInodeID int64) error {
+	entries, err := e.DirectoryManager.ReadDirectory(dirInodeID)
+	if err != nil {
+		return fmt.Errorf("RemoveRecursive: Error leyendo directorio %d: %v", dirInodeID, err)
+	}
+
+	for _, entry := range entries {
+		name := strings.Trim(string(entry.B_name[:]), "\x00")
+		childID := entry.B_inodo
+
+		childInode, err := e.InodeManager.ReadInode(childID)
+		if err != nil {
+			return fmt.Errorf("RemoveRecursive: Error leyendo inodo hijo %d (%s): %v", childID, name, err)
+		}
+
+		// Verificar permiso de escritura antes de continuar
+		if !e.hasPermission(childInode, "w") {
+			return fmt.Errorf("RemoveRecursive: Permiso denegado en '%s'", name)
+		}
+
+		if childInode.I_type == FILE_TYPE {
+			if err := e.FileManager.DeleteFile(dirInodeID, name); err != nil {
+				return fmt.Errorf("RemoveRecursive: Error eliminando archivo '%s': %v", name, err)
+			}
+		} else if childInode.I_type == DIR_TYPE {
+			if err := e.removeRecursive(childID); err != nil {
+				return err // si falla uno, se cancela todo
+			}
+			if err := e.DirectoryManager.DeleteEntry(dirInodeID, name); err != nil {
+				return fmt.Errorf("RemoveRecursive: Error eliminando subdirectorio '%s': %v", name, err)
+			}
+		}
+	}
+
+	// Finalmente eliminar el propio directorio (ya vacío)
+	if err := e.DirectoryManager.DeleteDirectory(dirInodeID); err != nil {
+		return fmt.Errorf("RemoveRecursive: Error eliminando directorio %d: %v", dirInodeID, err)
+	}
+
+	return nil
+}
+
 /*
 	CRUD MANEJO DE LAS ESTRUCURAS
 	"DIRECTORIO". TAMBIÉN SE MODIFICAN LOS BITMAPS
@@ -186,6 +228,34 @@ func (dm *DirectoryManager) DeleteDirectory(dirInodeID int64) error {
 	return nil
 }
 
+/*
+func (dm *DirectoryManager) DeleteDirectoryRecursive(dirInodeID int64) error {
+	entries, err := dm.ReadDirectory(dirInodeID)
+	if err != nil {
+		return err
+	}
+
+	for _, e := range entries {
+		childInode := e.B_inodo
+		name := strings.Trim(string(e.B_name[:]), "\x00")
+		childInodeStruct, err := dm.InodeManager.ReadInode(childInode)
+		if err != nil {
+			return err
+		}
+		if childInodeStruct.I_type == DIR_TYPE {
+			if err := dm.DeleteDirectoryRecursive(childInode); err != nil {
+				return err
+			}
+		} else {
+			if err := dm.InodeManager.DeleteInode(childInode); err != nil {
+				return err
+			}
+		}
+	}
+	return dm.DeleteDirectory(dirInodeID)
+}
+*/
+
 func (dm *DirectoryManager) AddEntry(parentInodeID int64, name string, inodeID int64) error {
 	// 1. Validar ID padre
 	if parentInodeID < 0 {
@@ -285,6 +355,118 @@ func (dm *DirectoryManager) AddEntry(parentInodeID int64, name string, inodeID i
 	return nil
 }
 
+func (dm *DirectoryManager) DeleteEntry(parentInodeID int64, name string) error {
+	// 1️⃣ Leer el inodo del directorio padre
+	inode, err := dm.InodeManager.ReadInode(parentInodeID)
+	if err != nil {
+		return fmt.Errorf("DeleteEntry: error leyendo inodo padre %d: %v", parentInodeID, err)
+	}
+	if inode.I_type != DIR_TYPE {
+		return fmt.Errorf("DeleteEntry: el inodo %d no es un directorio", parentInodeID)
+	}
+
+	// 2️⃣ Buscar en los bloques directos del directorio
+	for _, blockID := range inode.I_block {
+		if blockID == -1 {
+			continue
+		}
+
+		raw, err := dm.BlockManager.ReadBlock(blockID)
+		if err != nil {
+			return fmt.Errorf("DeleteEntry: error leyendo bloque %d: %v", blockID, err)
+		}
+
+		var dir file.Directory
+		buf := bytes.NewReader(raw)
+		if err := binary.Read(buf, binary.LittleEndian, &dir); err != nil {
+			return fmt.Errorf("DeleteEntry: error parseando bloque %d: %v", blockID, err)
+		}
+
+		// 3️⃣ Buscar el nombre dentro de las 4 entradas
+		updated := false
+		for i := range dir.B_content {
+			entryName := strings.Trim(string(dir.B_content[i].B_name[:]), "\x00")
+			if entryName == name {
+				dir.B_content[i].B_inodo = -1
+				for j := range dir.B_content[i].B_name {
+					dir.B_content[i].B_name[j] = 0
+				}
+				updated = true
+				break
+			}
+		}
+
+		// 4️⃣ Si se encontró y modificó → reescribir el bloque
+		if updated {
+			bufOut := new(bytes.Buffer)
+			if err := binary.Write(bufOut, binary.LittleEndian, &dir); err != nil {
+				return fmt.Errorf("DeleteEntry: error serializando bloque %d: %v", blockID, err)
+			}
+			if err := dm.BlockManager.UpdateBlock(blockID, bufOut.Bytes()); err != nil {
+				return fmt.Errorf("DeleteEntry: error actualizando bloque %d: %v", blockID, err)
+			}
+			return nil
+		}
+	}
+
+	// 5️⃣ Si no se encontró la entrada
+	return fmt.Errorf("DeleteEntry: '%s' no encontrado en el directorio padre", name)
+}
+
+func (dm *DirectoryManager) RenameEntry(parentInodeID int64, oldName string, newName string) error {
+	inode, err := dm.InodeManager.ReadInode(parentInodeID)
+	if err != nil {
+		return fmt.Errorf("RenameEntry: Error leyendo inodo padre: %v", err)
+	}
+	if inode.I_type != DIR_TYPE {
+		return fmt.Errorf("RenameEntry: El inodo %d no es un directorio", parentInodeID)
+	}
+
+	for _, blockID := range inode.I_block {
+		if blockID == -1 {
+			continue
+		}
+
+		raw, err := dm.BlockManager.ReadBlock(blockID)
+		if err != nil {
+			return fmt.Errorf("RenameEntry: Error leyendo bloque %d: %v", blockID, err)
+		}
+
+		var dir file.Directory
+		buf := bytes.NewReader(raw)
+		if err := binary.Read(buf, binary.LittleEndian, &dir); err != nil {
+			return fmt.Errorf("RenameEntry: Error parseando bloque %d: %v", blockID, err)
+		}
+
+		updated := false
+		for i := range dir.B_content {
+			entryName := strings.Trim(string(dir.B_content[i].B_name[:]), "\x00")
+			if entryName == oldName {
+				// Sobrescribir nombre
+				for j := range dir.B_content[i].B_name {
+					dir.B_content[i].B_name[j] = 0
+				}
+				copy(dir.B_content[i].B_name[:], []byte(newName))
+				updated = true
+				break
+			}
+		}
+
+		if updated {
+			bufOut := new(bytes.Buffer)
+			if err := binary.Write(bufOut, binary.LittleEndian, &dir); err != nil {
+				return fmt.Errorf("RenameEntry: Error serializando bloque: %v", err)
+			}
+			if err := dm.BlockManager.UpdateBlock(blockID, bufOut.Bytes()); err != nil {
+				return fmt.Errorf("RenameEntry: Error actualizando bloque: %v", err)
+			}
+			return nil
+		}
+	}
+
+	return fmt.Errorf("RenameEntry: No se encontró '%s' en el directorio padre", oldName)
+}
+
 func (dm *DirectoryManager) ResolvePath(path string) (int64, string, error) {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	// Tomar el inodo raíz desde el superbloque (esto evita desfases manuales)
@@ -332,8 +514,4 @@ func (dm *DirectoryManager) ListDirectory(dirInodeID int64) ([]string, error) {
 		names = append(names, strings.Trim(string(entry.B_name[:]), "\x00"))
 	}
 	return names, nil
-}
-
-func (dm *DirectoryManager) RemoveEntry(dirInodeID int64, name string) error {
-	return nil
 }

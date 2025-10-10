@@ -1,8 +1,10 @@
 package main
 
 import (
+	dmanager "backend/disk_manager"
 	parser "backend/parser"
-	visit "backend/util"
+	util "backend/util"
+
 	"encoding/json"
 	"io"
 	"net/http"
@@ -12,16 +14,26 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 )
 
-var globalVisitor *visit.Visitor
+var globalVisitor *util.Visitor
+var requestManager *util.RequestManager
+var diskManager = dmanager.NewDiskManager()
+var listMountedPartitions = dmanager.NewMountedPartitionList()
+var idMountedAndLogued = new(string)
 
 func main() {
 	fmt.Println("=== Servidor MIA Proyecto ===")
 
 	// Inicializar visitor global
-	globalVisitor = visit.NewVisitor()
+	globalVisitor = util.NewVisitor(diskManager, &listMountedPartitions, idMountedAndLogued)
+	requestManager = util.NewRequestManager(diskManager, &listMountedPartitions, idMountedAndLogued)
 
 	// Configura el manejador para la ruta /execute
 	http.HandleFunc("/execute", handleExecute)
+	http.HandleFunc("/api/fs/list", requestManager.ListHandler)
+	http.HandleFunc("/api/fs/read", requestManager.ReadHandler)
+	http.HandleFunc("/api/fs/mkdir", requestManager.MkdirHandler)
+	http.HandleFunc("/api/fs/create", requestManager.MkfileHandler)
+	http.HandleFunc("/api/fs/delete", requestManager.DeleteHandler)
 
 	fmt.Println("Servidor escuchando en http://localhost:8080/execute")
 	err := http.ListenAndServe(":8080", nil)

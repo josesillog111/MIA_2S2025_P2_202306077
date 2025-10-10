@@ -1,5 +1,6 @@
 // src/App.tsx
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import Split from 'react-split'; 
 import Sidebar from './components/Sidebar';
 import Editor from './components/Editor';
@@ -8,8 +9,8 @@ import Ribbon from './components/Ribbon';
 import Console from './components/Console';
 import './App.css';
 
-import { saveFile, openFolder } from './services/fileService';
-import type { EditorFile } from './services/fileService';
+import { saveFile, openFolder } from './services/FileService';
+import type { EditorFile } from './services/FileService';
 
 const initialFiles: EditorFile[] = [
   { name: 'index.ts', path: 'src/index.ts', content: 'console.log("Hello from a TypeScript file!");' },
@@ -18,6 +19,9 @@ const initialFiles: EditorFile[] = [
 ];
 
 const App: React.FC = () => {
+
+  const navigate = useNavigate();
+
   const [files, setFiles] = useState<EditorFile[]>(initialFiles);
   const [activeFile, setActiveFile] = useState<EditorFile | null>(initialFiles[0]);
   const [consoleOutput, setConsoleOutput] = useState('');
@@ -106,6 +110,10 @@ const App: React.FC = () => {
   const handleCopy = () => editorRef.current?.copy();
   const handlePaste = () => editorRef.current?.paste();
 
+  const handleOpenFileExplorer = () => {
+    navigate('/file_explorer'); 
+  };
+
   return (
     <div className="vscode-container">
       <Ribbon 
@@ -125,6 +133,7 @@ const App: React.FC = () => {
         onCut={handleCut}
         onCopy={handleCopy}
         onPaste={handlePaste}
+        onFileExplorer={handleOpenFileExplorer}
       />
       <div className="main-content">
         <Split

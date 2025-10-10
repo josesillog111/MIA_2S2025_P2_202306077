@@ -81,6 +81,51 @@ func (e *EbrManager) AddEBR(path string, extended *disk.Partition, newEbr *disk.
 	return nil
 }
 
+func (e *EbrManager) DeleteEBR(path string, ebrToDelete *disk.EBR, ebrs []disk.EBR) error {
+	// Abrir el archivo en modo lectura/escritura
+	file, err := os.OpenFile(path, os.O_RDWR, 0666)
+	if err != nil {
+		return fmt.Errorf("DeleteEBR: no se pudo abrir el disco: %v", err)
+	}
+	defer file.Close()
+
+	// Encontrar el EBR anterior al que queremos eliminar
+	var prevEbr *disk.EBR
+	for i := range ebrs {
+		if ebrs[i].Part_next == ebrToDelete.Part_start {
+			prevEbr = &ebrs[i]
+			break
+		}
+	}
+
+	// Si encontramos un EBR anterior, actualizar su Part_next
+	if prevEbr != nil {
+		prevEbr.Part_next = ebrToDelete.Part_next
+	}
+	// Reescribir el EBR anterior con el nuevo Part_next
+	if prevEbr != nil {
+		if _, err := file.Seek(prevEbr.Part_start, 0); err != nil {
+			return fmt.Errorf("DeleteEBR: error al posicionar archivo en EBR anterior: %v", err)
+		}
+		if err := binary.Write(file, binary.LittleEndian, prevEbr); err != nil {
+			return fmt.Errorf("DeleteEBR: error al actualizar EBR anterior: %v", err)
+		}
+	}
+	// Si no encontramos un EBR anterior, el EBR a eliminar es el primero
+	// En este caso, no necesitamos actualizar ningún otro EBR
+
+	// Opcional: limpiar el EBR eliminado (no es estrictamente necesario)
+	var emptyEbr disk.EBR
+	if _, err := file.Seek(ebrToDelete.Part_start, 0); err != nil {
+		return fmt.Errorf("DeleteEBR: error al posicionar archivo para limpiar EBR: %v", err)
+	}
+	if err := binary.Write(file, binary.LittleEndian, &emptyEbr); err != nil {
+		return fmt.Errorf("DeleteEBR: error al limpiar EBR eliminado: %v", err)
+	}
+	// Opcional: actualizar la lista de EBRs en memoria
+	return nil
+}
+
 func (e *EbrManager) ReadEBR(path string, start int64) (disk.EBR, error) {
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0666)

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Constantes
+// Constantes de control de estado de partición
 const (
 	STATUS_FREE = 0
 	STATUS_USED = 1
@@ -25,6 +25,7 @@ type DiskManager struct {
 	FreeSpaceManager *FreeSpaceManager
 	MbrManager       *MbrManager
 	EbrManager       *EbrManager
+	PartitionManager *PartitionManager
 }
 
 func NewDiskManager() *DiskManager {
@@ -32,245 +33,8 @@ func NewDiskManager() *DiskManager {
 		FreeSpaceManager: &FreeSpaceManager{},
 		MbrManager:       &MbrManager{},
 		EbrManager:       &EbrManager{},
+		PartitionManager: &PartitionManager{},
 	}
-}
-
-func (d *DiskManager) CreatePrimary(name string, size int64, fit string, path string) error {
-
-	// 1. Validaciones
-	mbr, err := d.MbrManager.ReadMBR(path)
-	if err != nil {
-		return fmt.Errorf("CreatePrimary: error al leer el MBR: %v", err)
-	}
-
-	partitionCount := 0
-	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_USED {
-			partitionCount++
-			if strings.Trim(string(mbr.Mbr_partition[i].Part_name[:]), "\x00") == name {
-				return fmt.Errorf("CreatePrimary: ya existe una partición con el nombre '%s'", name)
-			}
-		}
-	}
-	if partitionCount >= 4 {
-		return fmt.Errorf("CreatePrimary: ya existen 4 particiones, no se pueden crear más")
-	}
-
-	// 2. Encontrar un hueco libre
-	free := d.FreeSpaceManager.GetFreeSpaces(&mbr)
-
-	var bestFitStart int64 = -1
-	switch strings.ToUpper(fit) {
-	case "FF":
-		bestFitStart = d.FreeSpaceManager.FindFirstFit(size, free)
-	case "BF":
-		bestFitStart = d.FreeSpaceManager.FindBestFit(size, free)
-	case "WF":
-		bestFitStart = d.FreeSpaceManager.FindWorstFit(size, free)
-	}
-	if bestFitStart < 0 {
-		return fmt.Errorf("CreatePrimary: no hay espacio suficiente para la partición primaria")
-	}
-
-	// 3. Crear la nueva estructura de Partición
-	var newPartition disk.Partition
-	newPartition.Part_status = '1' // ACTIVA
-	newPartition.Part_type = 'P'
-	newPartition.Part_fit = byte(strings.ToUpper(fit)[0])
-	newPartition.Part_start = bestFitStart
-	newPartition.Part_size = size
-	copy(newPartition.Part_name[:], name)
-
-	// 4. Añadirla a un slot vacío en el MBR
-	added := false
-	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_FREE { // libre
-			mbr.Mbr_partition[i] = newPartition
-			added = true
-			break
-		}
-	}
-	if !added {
-		return fmt.Errorf("CreatePrimary: no se pudo añadir la partición al MBR")
-	}
-
-	// 5. Escribir el MBR actualizado de vuelta al disco
-	err = d.MbrManager.WriteMBR(&mbr, path)
-	if err != nil {
-		return fmt.Errorf("CreatePrimary: error al escribir el MBR: %v", err)
-	}
-
-	return nil
-}
-
-func (d *DiskManager) CreateExtended(name string, size int64, fit string, path string) error {
-
-	mbr, err := d.MbrManager.ReadMBR(path)
-	if err != nil {
-		return fmt.Errorf("CreateExtended: error al leer el MBR: %v", err)
-	}
-
-	partitionCount := 0
-	hasExtended := false
-	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_USED {
-			partitionCount++
-			if mbr.Mbr_partition[i].Part_type == 'E' {
-				hasExtended = true
-			}
-			if strings.Trim(string(mbr.Mbr_partition[i].Part_name[:]), "\x00") == name {
-				return fmt.Errorf("CreateExtended: ya existe una partición con el nombre '%s'", name)
-			}
-		}
-	}
-	if partitionCount >= 4 {
-		return fmt.Errorf("CreateExtended: ya existen 4 particiones, no se pueden crear más")
-	}
-	if hasExtended {
-		return fmt.Errorf("CreateExtended: ya existe una partición extendida en este disco")
-	}
-
-	// 2. Buscar hueco disponible
-	freeSpaces := d.FreeSpaceManager.GetFreeSpaces(&mbr)
-	var bestFitStart int64 = -1
-
-	switch strings.ToUpper(fit) {
-	case "FF":
-		bestFitStart = d.FreeSpaceManager.FindFirstFit(size, freeSpaces)
-	case "BF":
-		bestFitStart = d.FreeSpaceManager.FindBestFit(size, freeSpaces)
-	case "WF":
-		bestFitStart = d.FreeSpaceManager.FindWorstFit(size, freeSpaces)
-	}
-
-	if bestFitStart == -1 {
-		return fmt.Errorf("CreateExtended: no hay suficiente espacio contiguo para la partición")
-	}
-
-	// 3. Verificar solapamiento
-	for i := 0; i < 4; i++ {
-		p := mbr.Mbr_partition[i]
-		if p.Part_status == STATUS_USED {
-			end := p.Part_start + p.Part_size
-			if !(bestFitStart+size <= p.Part_start || bestFitStart >= end) {
-				return fmt.Errorf("CreateExtended:la nueva partición se solapa con '%s'", string(p.Part_name[:]))
-			}
-		}
-	}
-
-	// 4. Crear la partición extendida
-	var newPartition disk.Partition
-	newPartition.Part_status = STATUS_USED
-	newPartition.Part_type = 'E'
-	newPartition.Part_fit = byte(strings.ToUpper(fit)[0])
-	newPartition.Part_start = bestFitStart
-	newPartition.Part_size = size
-	copy(newPartition.Part_name[:], name)
-
-	// 5. Guardarla en el MBR
-	added := false
-	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_FREE {
-			mbr.Mbr_partition[i] = newPartition
-			added = true
-			break
-		}
-	}
-	if !added {
-		return fmt.Errorf("CreateExtended: no se encontró un slot libre en el MBR")
-	}
-
-	// 6. Escribir MBR en disco
-	err = d.MbrManager.WriteMBR(&mbr, path)
-	if err != nil {
-		return fmt.Errorf("CreateExtended: error al escribir el MBR: %v", err)
-	}
-
-	// 7. Inicializar primer EBR
-	var firstEBR disk.EBR
-	firstEBR.Part_mount = STATUS_FREE
-	firstEBR.Part_fit = newPartition.Part_fit
-	firstEBR.Part_start = newPartition.Part_start
-	firstEBR.Part_size = 0
-	firstEBR.Part_next = -1
-
-	err = d.EbrManager.WriteEBR(&firstEBR, path, newPartition.Part_start)
-	if err != nil {
-		return fmt.Errorf("CreateExtended: error al inicializar el primer EBR: %v", err)
-	}
-
-	return nil
-}
-
-func (d *DiskManager) CreateLogical(name string, size int64, fit string, path string) error {
-	// 1. Buscar la partición extendida en el MBR
-	mbr, err := d.MbrManager.ReadMBR(path)
-	if err != nil {
-		return fmt.Errorf("CreateLogical: error al leer el MBR: %v", err)
-	}
-
-	var extendedPartition *disk.Partition
-	for i := 0; i < 4; i++ {
-		p := &mbr.Mbr_partition[i]
-		if p.Part_status == STATUS_USED && p.Part_type == 'E' {
-			extendedPartition = p
-			break
-		}
-	}
-
-	if extendedPartition == nil {
-		return fmt.Errorf("CreateLogical: no existe partición extendida en el disco, no se puede crear lógica")
-	}
-
-	// 2. Cargar la lista de EBRs desde disco
-	ebrs, err := d.EbrManager.GetEBRs(path, *extendedPartition)
-	if err != nil {
-		return fmt.Errorf("CreateLogical: error al cargar los EBRs: %v", err)
-	}
-
-	// 3. Validar que no exista una partición lógica con el mismo nombre
-	for _, e := range ebrs {
-		existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-		if e.Part_mount == STATUS_USED && existingName == name {
-			return fmt.Errorf("CreateLogical: ya existe una partición lógica con el nombre '%s'", name)
-		}
-	}
-
-	// 4. Buscar espacio libre dentro de la extendida
-	free := d.FreeSpaceManager.GetFreeSpacesInExtended(*extendedPartition, ebrs)
-
-	var start int64 = -1
-	switch strings.ToUpper(fit) {
-	case "FF":
-		start = d.FreeSpaceManager.FindFirstFit(size, free)
-	case "BF":
-		start = d.FreeSpaceManager.FindBestFit(size, free)
-	case "WF":
-		start = d.FreeSpaceManager.FindWorstFit(size, free)
-	default:
-		return fmt.Errorf("CreateLogical: ajuste '%s' no soportado para lógica", fit)
-	}
-
-	if start < 0 {
-		return fmt.Errorf("CreateLogical: no hay espacio suficiente en la extendida para la lógica")
-	}
-
-	// 5. Crear el nuevo EBR
-	var newEbr disk.EBR
-	newEbr.Part_mount = STATUS_USED
-	newEbr.Part_fit = byte(strings.ToUpper(fit)[0])
-	newEbr.Part_start = start
-	newEbr.Part_size = size
-	newEbr.Part_next = -1
-	copy(newEbr.Part_name[:], name)
-
-	// 6. Insertar en la lista de EBRs y enlazar
-	err = d.EbrManager.AddEBR(path, extendedPartition, &newEbr, ebrs)
-	if err != nil {
-		return fmt.Errorf("CreateLogical: error al insertar el nuevo EBR: %v", err)
-	}
-
-	return nil
 }
 
 func (d *DiskManager) Mkdisk(size int64, fit string, unit string, path string) error {
@@ -361,16 +125,205 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 		return fmt.Errorf("Fdisk: error al leer el MBR: %v", err)
 	}
 
-	// 2.1 Validar si ya existe una partición con ese nombre en el MBR
-	for i := 0; i < 4; i++ {
-		existingName := strings.Trim(string(mbr.Mbr_partition[i].Part_name[:]), "\x00")
-		if existingName == name {
-			return fmt.Errorf("Fdisk: ya existe una partición con el nombre '%s'", name)
+	/*
+		MODO ADD:
+		Este parámetro se utilizará para agregar o quitar
+		espacio de la partición. Puede ser positivo o
+		negativo. Tomará el parámetro units para las
+		unidades a agregar o eliminar.
+		En el caso de agregar espacio, deberá comprobar
+		que exista espacio libre después de la partición.
+		En el caso de quitar espacio se debe comprobar
+		que quede espacio en la partición (no espacio
+		negativo).
+	*/
+
+	if add != 0 {
+		// Buscar la partición a modificar
+		var targetPartition *disk.Partition
+
+		// Buscar en particiones primarias, extendidas y lógicas
+		for i := 0; i < 4; i++ {
+			p := &mbr.Mbr_partition[i]
+			existingName := strings.Trim(string(p.Part_name[:]), "\x00")
+			if p.Part_status == STATUS_USED && existingName == name {
+				targetPartition = p
+				break
+			}
 		}
+
+		var extendedPartition *disk.Partition // <-- define outside so it's accessible below
+		if targetPartition == nil {
+			// Buscar en lógicas si no se encontró en primarias/extendidas
+			for i := 0; i < 4; i++ {
+				p := &mbr.Mbr_partition[i]
+				if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+					extendedPartition = p
+					break
+				}
+			}
+			if extendedPartition != nil {
+				ebrs, err := d.EbrManager.GetEBRs(path, *extendedPartition)
+				if err != nil {
+					return fmt.Errorf("Fdisk: error al cargar los EBRs: %v", err)
+				}
+				for i := range ebrs {
+					e := &ebrs[i]
+					existingName := strings.Trim(string(e.Part_name[:]), "\x00")
+					if e.Part_mount == STATUS_USED && existingName == name {
+						targetPartition = &disk.Partition{
+							Part_status: e.Part_mount,
+							Part_type:   'L',
+							Part_fit:    e.Part_fit,
+							Part_start:  e.Part_start,
+							Part_size:   e.Part_size,
+						}
+						break
+					}
+				}
+			}
+		}
+
+		if targetPartition == nil {
+			return fmt.Errorf("Fdisk: no se encontró una partición con el nombre '%s' para modificar", name)
+		}
+
+		if targetPartition.Part_type == 'P' {
+			// Partición primaria
+			err := d.PartitionManager.AddPrimary(path, *targetPartition, add, unit)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al modificar la partición primaria: %v", err)
+			}
+		} else if targetPartition.Part_type == 'E' {
+			// Partición extendida
+			err := d.PartitionManager.AddExtended(path, *targetPartition, add, unit)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al modificar la partición extendida: %v", err)
+			}
+		} else if targetPartition.Part_type == 'L' {
+			// Partición lógica
+			if extendedPartition == nil {
+				// Buscar la extendida si no se encontró antes
+				for i := 0; i < 4; i++ {
+					p := &mbr.Mbr_partition[i]
+					if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+						extendedPartition = p
+						break
+					}
+				}
+				if extendedPartition == nil {
+					return fmt.Errorf("Fdisk: no se encontró partición extendida para modificar lógica")
+				}
+			}
+			err := d.PartitionManager.AddLogical(path, *extendedPartition, disk.EBR{
+				Part_mount: targetPartition.Part_status,
+				Part_fit:   targetPartition.Part_fit,
+				Part_start: targetPartition.Part_start,
+				Part_size:  targetPartition.Part_size,
+				Part_next:  -1,
+				Part_name:  [16]byte{},
+			}, add, unit, name)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al modificar la partición lógica: %v", err)
+			}
+		} else {
+			return fmt.Errorf("Fdisk: el tipo de partición '%c' no es válido para modificación", targetPartition.Part_type)
+		}
+
+		return nil
+
+	}
+
+	/*
+		MODO DELETE:
+		Este parámetro indica que se eliminará una
+		partición. Este parámetro se utiliza junto con -name
+		y -path.
+		Se deberá mostrar un mensaje que permita
+		confirmar la eliminación de dicha partición.
+		Si la partición no existe deberá mostrar error. Si
+		se elimina la partición extendida, deben
+		eliminarse las particiones lógicas que tenga
+		adentro.
+		Recibirá los siguientes valores:
+		Fast: Esta opción marca como vacío el espacio en
+		la tabla de particiones.
+		Full: Esta opción además marcar como vació el
+		espacio en la tabla de particiones, rellena el espacio
+		con el carácter \0. Si se utiliza otro valor diferente,
+		mostrará un mensaje de error.
+	*/
+
+	if delete != "" {
+
+		/*
+
+			MENSAJE DE CONFIRMACIÓN  < ACTUALIZAR EN EL FUTURO >
+
+		*/
+		fmt.Printf("¿Está seguro que desea eliminar la partición '%s'? (s/n): ", name)
+		var resp string
+		for {
+			fmt.Scanln(&resp)
+			resp = strings.ToUpper(resp)
+			if resp == "S" {
+				break
+			}
+			if resp == "N" {
+				return fmt.Errorf("Fdisk: Eliminación cancelada por el usuario")
+			}
+
+			fmt.Print("Respuesta inválida. Por favor ingrese 's' para sí o 'n' para no: ")
+		}
+
+		if delete != "Fast" && delete != "Full" {
+			return fmt.Errorf("Fdisk: el modo de borrado '%s' no es válido", delete)
+		}
+
+		// Buscar la partición a eliminar
+		var targetIndex int = -1
+		var targetPartition disk.Partition
+		for i := 0; i < 4; i++ {
+			p := &mbr.Mbr_partition[i]
+			existingName := strings.Trim(string(p.Part_name[:]), "\x00")
+			if p.Part_status == STATUS_USED && existingName == name {
+				targetIndex = i
+				targetPartition = *p
+				break
+			}
+		}
+		if targetIndex == -1 {
+			return fmt.Errorf("Fdisk: no se encontró una partición con el nombre '%s' para eliminar", name)
+		}
+
+		// Eliminar según el tipo de partición
+
+		if mbr.Mbr_partition[targetIndex].Part_type == 'P' {
+			// Partición primaria
+			err := d.PartitionManager.DeletePrimary(path, targetPartition, delete)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al eliminar la partición primaria: %v", err)
+			}
+		} else if mbr.Mbr_partition[targetIndex].Part_type == 'E' {
+			// Partición extendida
+			err := d.PartitionManager.DeleteExtended(path, targetPartition, delete)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al eliminar la partición extendida: %v", err)
+			}
+		} else if mbr.Mbr_partition[targetIndex].Part_type == 'L' {
+			// Partición lógica
+			err := d.PartitionManager.DeleteLogical(path, targetPartition, name, delete)
+			if err != nil {
+				return fmt.Errorf("Fdisk: error al eliminar la partición lógica: %v", err)
+			}
+		} else {
+			return fmt.Errorf("Fdisk: el tipo de partición '%c' no es válido para eliminación", mbr.Mbr_partition[targetIndex].Part_type)
+		}
+
+		return nil
 	}
 
 	// 2.2 Solo se permite una partición extendida por disco
-
 	var extendedCount int
 	for i := 0; i < 4; i++ {
 		if mbr.Mbr_partition[i].Part_type == 'E' {
@@ -396,11 +349,11 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 	// 4. Crear partición según tipo
 	switch strings.ToUpper(string(parType)) {
 	case "P":
-		return d.CreatePrimary(name, partitionSize, fit, path)
+		return d.PartitionManager.CreatePrimary(name, partitionSize, fit, path)
 	case "E":
-		return d.CreateExtended(name, partitionSize, fit, path)
+		return d.PartitionManager.CreateExtended(name, partitionSize, fit, path)
 	case "L":
-		return d.CreateLogical(name, partitionSize, fit, path)
+		return d.PartitionManager.CreateLogical(name, partitionSize, fit, path)
 	default:
 		return fmt.Errorf("Fdisk: tipo de partición '%c' no reconocido", parType)
 	}
@@ -482,7 +435,7 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 			if ebrName == name {
 				currentEBR.Part_mount = 1
 
-				// 🔹 Generar ID aquí
+				// Generar ID aquí
 				id, partNum := list.GetNextId(path)
 
 				var pid [4]byte
@@ -526,6 +479,37 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 }
 
 func (d *DiskManager) Unmount(list MountedPartitionList, id string) error {
+	partition := list.GetPartitionById(id)
+	if partition == nil {
+		return fmt.Errorf("Unmount: no existe una partición montada con ID '%s'", id)
+	}
+
+	err := list.UnsetPartition(id)
+	if err != nil {
+		return fmt.Errorf("Unmount: error al desmontar la partición: %v", err)
+	}
+
+	// Actualizar el MBR en disco para reflejar que la partición ya no está montada
+	mbr, err := d.MbrManager.ReadMBR(partition.Path)
+	if err != nil {
+		return fmt.Errorf("Unmount: error al leer el MBR: %v", err)
+	}
+
+	for i := 0; i < 4; i++ {
+		p := &mbr.Mbr_partition[i]
+		if bytes.Equal(p.Part_id[:], []byte(id)) {
+			p.Part_status = STATUS_FREE
+			p.Part_id = [4]byte{}
+			p.Part_correlative = 0
+			break
+		}
+	}
+
+	err = d.MbrManager.WriteMBR(&mbr, partition.Path)
+	if err != nil {
+		return fmt.Errorf("Unmount: error al actualizar el MBR en el disco: %v", err)
+	}
+
 	return nil
 }
 

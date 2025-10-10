@@ -12,6 +12,7 @@ interface RibbonProps {
   onCut: () => void;
   onCopy: () => void;
   onPaste: () => void;
+  onFileExplorer: () => void;
 }
 
 const Ribbon: React.FC<RibbonProps> = ({ 
@@ -22,7 +23,8 @@ const Ribbon: React.FC<RibbonProps> = ({
   onRedo, 
   onCut, 
   onCopy, 
-  onPaste 
+  onPaste,
+  onFileExplorer
 }) => {
   return (
     <nav className="ribbon">
@@ -42,6 +44,10 @@ const Ribbon: React.FC<RibbonProps> = ({
           <li className="ribbon-menu-item" onClick={onCut}>Cut</li>
           <li className="ribbon-menu-item" onClick={onCopy}>Copy</li>
           <li className="ribbon-menu-item" onClick={onPaste}>Paste</li>
+        </RibbonItem>
+
+        <RibbonItem label="Disk">
+          <li className="ribbon-menu-item" onClick={onFileExplorer}>Explorador de Archivos</li>
         </RibbonItem>
       </ul>
     </nav>

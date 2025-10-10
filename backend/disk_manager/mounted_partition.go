@@ -102,6 +102,17 @@ func (m *MountedPartitionList) SetPartition(id string, path string, part disk.Pa
 	return nil
 }
 
+func (m *MountedPartitionList) UnsetPartition(id string) error {
+	for i, part := range m.Partitions {
+		if part.Id == id {
+			// Eliminar la partición montada de la lista
+			m.Partitions = append(m.Partitions[:i], m.Partitions[i+1:]...)
+			return nil
+		}
+	}
+	return fmt.Errorf("UnsetPartition: no se encontró la partición con ID %s", id)
+}
+
 func (m *MountedPartitionList) GetPartitionById(id string) *MountedPartition {
 	for _, part := range m.Partitions {
 		if part.Id == id {
@@ -118,4 +129,17 @@ func (m *MountedPartitionList) GetPathById(id string) string {
 		}
 	}
 	return ""
+}
+
+func (m *MountedPartitionList) GetPartitions() string {
+	var result strings.Builder
+	result.WriteString("Particiones montadas:\n")
+	for _, part := range m.Partitions {
+		partName := ""
+		if part.Partition != nil {
+			partName = strings.TrimRight(string(part.Partition.Part_name[:]), "\x00")
+		}
+		result.WriteString(fmt.Sprintf("ID: %s, Disco: %s, Partición: %s\n", part.Id, part.Path, partName))
+	}
+	return result.String()
 }

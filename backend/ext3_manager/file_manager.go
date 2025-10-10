@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type FileManager struct {
@@ -415,7 +416,7 @@ func (fm *FileManager) DeleteFile(parentInodeID int64, name string) error {
 	}
 
 	// 4. Eliminar entrada del directorio padre
-	if err := fm.DirectoryManager.RemoveEntry(parentInodeID, name); err != nil {
+	if err := fm.DirectoryManager.DeleteEntry(parentInodeID, name); err != nil {
 		return fmt.Errorf("DeleteFile: Error eliminando entrada del directorio padre: %v", err)
 	}
 
@@ -433,33 +434,26 @@ func (fm *FileManager) UpdateFile(inodeID int64, newContent []byte) error {
 	if err != nil {
 		return fmt.Errorf("UpdateFile: Error leyendo inodo: %v", err)
 	}
-
 	if inode.I_type != FILE_TYPE {
 		return fmt.Errorf("UpdateFile: El inodo %d no es un archivo", inodeID)
 	}
 
 	blockSize := int(fm.SBManager.SB.S_block_size)
-
-	// Dividir contenido en chunks
 	var chunks [][]byte
 	for len(newContent) > 0 {
-		chunk := newContent
-		if len(chunk) > blockSize {
-			chunk = chunk[:blockSize]
+		end := blockSize
+		if len(newContent) < end {
+			end = len(newContent)
 		}
-		chunks = append(chunks, chunk)
-		if len(newContent) > blockSize {
-			newContent = newContent[blockSize:]
-		} else {
-			break
-		}
+		chunks = append(chunks, newContent[:end])
+		newContent = newContent[end:]
 	}
 
+	// Escribir en bloques directos
 	chunkIndex := 0
 	for i := 0; i < 12 && chunkIndex < len(chunks); i++ {
 		blockID := inode.I_block[i]
 		if blockID == -1 {
-			// asignar nuevo bloque si no existe
 			newBlock, err := fm.BlockManager.CreateBlock(chunks[chunkIndex])
 			if err != nil {
 				return fmt.Errorf("UpdateFile: Error creando bloque directo: %v", err)
@@ -473,29 +467,37 @@ func (fm *FileManager) UpdateFile(inodeID int64, newContent []byte) error {
 		chunkIndex++
 	}
 
+	// Liberar bloques sobrantes directos
+	for i := chunkIndex; i < 12; i++ {
+		if inode.I_block[i] != -1 {
+			_ = fm.BlockManager.DeleteBlock(inode.I_block[i])
+			inode.I_block[i] = -1
+		}
+	}
+
+	// Indirecto simple, doble y triple
 	if chunkIndex < len(chunks) {
 		if err := fm.writeIndirect(&inode, 12, 1, chunks[chunkIndex:], &chunkIndex); err != nil {
 			return fmt.Errorf("UpdateFile: Error en indirecto simple: %v", err)
 		}
 	}
-
-	// 🔹 3. Escribir en indirecto doble
 	if chunkIndex < len(chunks) {
 		if err := fm.writeIndirect(&inode, 13, 2, chunks[chunkIndex:], &chunkIndex); err != nil {
 			return fmt.Errorf("UpdateFile: Error en indirecto doble: %v", err)
 		}
 	}
-
 	if chunkIndex < len(chunks) {
 		if err := fm.writeIndirect(&inode, 14, 3, chunks[chunkIndex:], &chunkIndex); err != nil {
 			return fmt.Errorf("UpdateFile: Error en indirecto triple: %v", err)
 		}
 	}
 
+	// Actualizar tamaño y tiempo
 	inode.I_size = 0
 	for _, c := range chunks {
 		inode.I_size += int64(len(c))
 	}
+	inode.I_mtime = time.Now().Unix()
 
 	if err := fm.InodeManager.UpdateInode(inodeID, inode); err != nil {
 		return fmt.Errorf("UpdateFile: Error guardando inodo actualizado: %v", err)

@@ -23,13 +23,13 @@ var fileRegex = regexp.MustCompile(`-file(\d+)`)
 func (v *Visitor) NewFileSystem(fsType string, partitionId string) (fsys.FileSystem, error) {
 	switch strings.ToLower(fsType) {
 	case "2fs":
-		partition := v.ListMountedPartitions.GetPartitionById(partitionId)
+		partition := (*v.ListMountedPartitions).GetPartitionById(partitionId)
 		if partition == nil {
 			return nil, fmt.Errorf("NewFileSystem: la partición con id '%s' no está montada", partitionId)
 		}
 		return ext2.NewEXT2(*partition), nil
 	case "3fs":
-		partition := v.ListMountedPartitions.GetPartitionById(partitionId)
+		partition := (*v.ListMountedPartitions).GetPartitionById(partitionId)
 		if partition == nil {
 			return nil, fmt.Errorf("NewFileSystem: la partición con id '%s' no está montada", partitionId)
 		}
@@ -81,18 +81,18 @@ type Visitor struct {
 	Console               string
 	Errors                string
 	DiskManager           *dmanager.DiskManager
-	ListMountedPartitions *dmanager.MountedPartitionList
-	IdMountedAndLogued    string /* ID de la partición montada y del usuario logueado */
+	ListMountedPartitions **dmanager.MountedPartitionList
+	IdMountedAndLogued    *string /* ID de la partición montada y del usuario logueado */
 	parser.BaseGoDiskGrammarVisitor
 }
 
-func NewVisitor() *Visitor {
+func NewVisitor(diskManager *dmanager.DiskManager, mountedPartitions **dmanager.MountedPartitionList, IdMountedAndLogued *string) *Visitor {
 	return &Visitor{
 		Console:               "",
 		Errors:                "",
-		DiskManager:           dmanager.NewDiskManager(),
-		ListMountedPartitions: dmanager.NewMountedPartitionList(),
-		IdMountedAndLogued:    "",
+		DiskManager:           diskManager,
+		ListMountedPartitions: mountedPartitions,
+		IdMountedAndLogued:    IdMountedAndLogued,
 	}
 }
 
@@ -462,10 +462,40 @@ func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
 	}
 
 	// Validaciones obligatorias
-	if size == 0 {
-		v.Errors += "FDISK: El parámetro 'size' es obligatorio.\n"
-		return nil
+	if used["delete"] {
+		var campo string
+		switch {
+		case used["size"]:
+			campo = "size"
+		case used["fit"]:
+			campo = "fit"
+		case used["unit"]:
+			campo = "unit"
+		case used["type"]:
+			campo = "type"
+		case used["add"]:
+			campo = "add"
+		}
+		if campo != "" {
+			v.Errors += fmt.Sprintf("FDISK: El parámetro '%s' no es necesario cuando se usa el parámetro 'delete'.\n", campo)
+		}
 	}
+
+	if used["add"] {
+		var campo string
+		switch {
+		case used["fit"]:
+			campo = "fit"
+		case used["type"]:
+			campo = "type"
+		case used["delete"]:
+			campo = "delete"
+		}
+		if campo != "" {
+			v.Errors += fmt.Sprintf("FDISK: El parámetro '%s' no es necesario cuando se usa el parámetro 'add'.\n", campo)
+		}
+	}
+
 	if path == "" {
 		v.Errors += "FDISK: El parámetro 'path' es obligatorio.\n"
 		return nil
@@ -557,17 +587,17 @@ func (v *Visitor) VisitMOUNT(ctx *parser.MOUNTContext) interface{} {
 	}
 
 	// Montar la partición
-	resultList, err := v.DiskManager.Mount(*v.ListMountedPartitions, path, name)
+	resultList, err := v.DiskManager.Mount(**v.ListMountedPartitions, path, name)
 	if err != nil {
 		v.Errors += fmt.Sprintf("MOUNT: Error al montar la partición: %v", err)
 		return nil
 	}
 
 	// Actualizar lista
-	v.ListMountedPartitions = &resultList
+	*v.ListMountedPartitions = &resultList
 
 	// Buscar partición recién montada
-	mounted := v.ListMountedPartitions.GetPartitionByPathAndName(path, name)
+	mounted := (*v.ListMountedPartitions).GetPartitionByPathAndName(path, name)
 	if mounted == nil {
 		v.Errors += "MOUNT: La partición montada no fue encontrada después de montar.\n"
 		return nil
@@ -620,12 +650,12 @@ func (v *Visitor) VisitUNMOUNT(ctx *parser.UNMOUNTContext) interface{} {
 		return nil
 	}
 	// Verificar que la partición esté montada
-	if v.ListMountedPartitions.GetPathById(id) == "" {
+	if (*v.ListMountedPartitions).GetPathById(id) == "" {
 		v.Errors += fmt.Sprintf("UNMOUNT: No se encontró ninguna partición montada para el ID %s.", id)
 		return nil
 	}
 	// Desmontar la partición
-	if err := v.DiskManager.Unmount(*v.ListMountedPartitions, id); err != nil {
+	if err := v.DiskManager.Unmount(**v.ListMountedPartitions, id); err != nil {
 		v.Errors += fmt.Sprintf("UNMOUNT: Error al desmontar la partición con ID %s: %v", id, err)
 		return nil
 	}
@@ -636,7 +666,7 @@ func (v *Visitor) VisitUNMOUNT(ctx *parser.UNMOUNTContext) interface{} {
 
 // Listar particiones montadas
 func (v *Visitor) VisitMOUNTED(ctx *parser.MOUNTEDContext) interface{} {
-	if mountedInfo, err := v.DiskManager.Mounted(*v.ListMountedPartitions); err != nil {
+	if mountedInfo, err := v.DiskManager.Mounted(**v.ListMountedPartitions); err != nil {
 		v.Errors += fmt.Sprintf("MOUNTED: Error listando particiones montadas: %v", err)
 	} else {
 		v.Console += mountedInfo
@@ -723,7 +753,7 @@ func (v *Visitor) VisitMKFS(ctx *parser.MKFSContext) interface{} {
 	}
 
 	// Verificar que la partición esté montada
-	if v.ListMountedPartitions.GetPathById(id) == "" {
+	if (*v.ListMountedPartitions).GetPathById(id) == "" {
 		v.Errors += fmt.Sprintf("MKFS: No se encontró ninguna partición montada para el ID %s.", id)
 		return nil
 	}
@@ -741,7 +771,7 @@ func (v *Visitor) VisitMKFS(ctx *parser.MKFSContext) interface{} {
 	}
 
 	// Asociar el FS a la partición montada
-	p := v.ListMountedPartitions.GetPartitionById(id)
+	p := (*v.ListMountedPartitions).GetPartitionById(id)
 	if p == nil {
 		v.Errors += fmt.Sprintf("MKFS: No se encontró partición montada con id %s.\n", id)
 		return nil
@@ -803,7 +833,7 @@ func (v *Visitor) VisitCAT(ctx *parser.CATContext) interface{} {
 	})
 
 	// Validar sesión activa
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "CAT: La partición con sesión activa no tiene un sistema de archivos.\n"
 		return nil
@@ -893,13 +923,13 @@ func (v *Visitor) VisitLOGIN(ctx *parser.LOGINContext) interface{} {
 	}
 
 	// Validar si ya hay sesión activa
-	if v.IdMountedAndLogued != "" {
-		v.Errors += fmt.Sprintf("LOGIN: Ya hay una sesión activa en la partición %s", v.IdMountedAndLogued)
+	if *v.IdMountedAndLogued != "" {
+		v.Errors += fmt.Sprintf("LOGIN: Ya hay una sesión activa en la partición %s", *v.IdMountedAndLogued)
 		return nil
 	}
 
 	// Validar partición montada
-	part := v.ListMountedPartitions.GetPartitionById(strings.Trim(id, " "))
+	part := (*v.ListMountedPartitions).GetPartitionById(strings.Trim(id, " "))
 	if part == nil || part.FileSystem == nil {
 		v.Errors += fmt.Sprintf("LOGIN: No se encontró una partición montada con ID %s o no tiene sistema de archivos.", id)
 		return nil
@@ -911,22 +941,22 @@ func (v *Visitor) VisitLOGIN(ctx *parser.LOGINContext) interface{} {
 		return nil
 	}
 
-	v.IdMountedAndLogued = id
-	v.Console += fmt.Sprintf("LOGIN: Logueado como %s en la partición %s\n", user, v.IdMountedAndLogued)
+	*v.IdMountedAndLogued = id
+	v.Console += fmt.Sprintf("LOGIN: Logueado como %s en la partición %s\n", user, *v.IdMountedAndLogued)
 	return nil
 }
 
 // Cerrar sesión
 func (v *Visitor) VisitLOGOUT(ctx *parser.LOGOUTContext) interface{} {
-	if v.IdMountedAndLogued == "" {
+	if *v.IdMountedAndLogued == "" {
 		v.Errors += "LOGOUT: No hay una sesión activa para cerrar sesión."
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "LOGOUT: No se encontró un sistema de archivos para la sesión actual."
-		v.IdMountedAndLogued = ""
+		*v.IdMountedAndLogued = ""
 		return nil
 	}
 
@@ -936,7 +966,7 @@ func (v *Visitor) VisitLOGOUT(ctx *parser.LOGOUTContext) interface{} {
 	}
 
 	v.Console += "LOGOUT: Cierre de sesión exitoso!\n"
-	v.IdMountedAndLogued = ""
+	*v.IdMountedAndLogued = ""
 	return nil
 }
 
@@ -958,7 +988,7 @@ func (v *Visitor) VisitMKGRP(ctx *parser.MKGRPContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "MKGRP: No hay un sistema de archivos encontrado."
 		return nil
@@ -990,7 +1020,7 @@ func (v *Visitor) VisitRMGRP(ctx *parser.RMGRPContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "RMGRP: No hay un sistema de archivos encontrado."
 		return nil
@@ -1084,7 +1114,7 @@ func (v *Visitor) VisitMKUSR(ctx *parser.MKUSRContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "MKUSR: No hay un sistema de archivos encontrado."
 		return nil
@@ -1114,7 +1144,7 @@ func (v *Visitor) VisitRMUSR(ctx *parser.RMUSRContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "RMUSR: No hay un sistema de archivos encontrado."
 		return nil
@@ -1184,7 +1214,7 @@ func (v *Visitor) VisitCHGRP(ctx *parser.CHGRPContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "CHGRP: No hay un sistema de archivos encontrado."
 		return nil
@@ -1267,7 +1297,7 @@ func (v *Visitor) VisitMKFILE(ctx *parser.MKFILEContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "MKFILE: No hay un sistema de archivos encontrado."
 		return nil
@@ -1316,7 +1346,7 @@ func (v *Visitor) VisitMKDIR(ctx *parser.MKDIRContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "MKDIR: No hay un sistema de archivos encontrado."
 		return nil
@@ -1352,7 +1382,7 @@ func (v *Visitor) VisitREMOVE(ctx *parser.REMOVEContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "REMOVE: No hay un sistema de archivos encontrado."
 		return nil
@@ -1404,7 +1434,7 @@ func (v *Visitor) VisitEDIT(ctx *parser.EDITContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "EDIT: No hay un sistema de archivos encontrado."
 		return nil
@@ -1456,7 +1486,7 @@ func (v *Visitor) VisitRENAME(ctx *parser.RENAMEContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "RENAME: No hay un sistema de archivos encontrado."
@@ -1509,7 +1539,7 @@ func (v *Visitor) VisitCOPY(ctx *parser.COPYContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "COPY: No hay un sistema de archivos encontrado."
 		return nil
@@ -1561,7 +1591,7 @@ func (v *Visitor) VisitMOVE(ctx *parser.MOVEContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "MOVE: No hay un sistema de archivos encontrado."
 		return nil
@@ -1623,7 +1653,7 @@ func (v *Visitor) VisitFIND(ctx *parser.FINDContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "FIND: No hay un sistema de archivos encontrado."
 		return nil
@@ -1697,7 +1727,7 @@ func (v *Visitor) VisitCHOWN(ctx *parser.CHOWNContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "CHOWN: No hay un sistema de archivos encontrado."
 		return nil
@@ -1716,7 +1746,7 @@ func (v *Visitor) VisitCHOWN(ctx *parser.CHOWNContext) interface{} {
 // Cambiar permisos de un archivo o directorio
 func (v *Visitor) VisitCHMOD(ctx *parser.CHMODContext) interface{} {
 	var path string
-	var ugo int64
+	var ugo uint16
 	recursive := false
 
 	used := make(map[string]bool)
@@ -1744,8 +1774,8 @@ func (v *Visitor) VisitCHMOD(ctx *parser.CHMODContext) interface{} {
 				return nil
 			}
 
-			ugo = int64(extractInt(children[len(children)-1]))
-			if ugo < 0 || ugo > 777 {
+			ugo = uint16(extractInt(children[len(children)-1]))
+			if ugo > 0777 {
 				v.Errors += "CHMOD: El parámetro 'ugo' debe estar entre 0 y 777."
 			}
 
@@ -1770,7 +1800,7 @@ func (v *Visitor) VisitCHMOD(ctx *parser.CHMODContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(v.IdMountedAndLogued)
+	part := (*v.ListMountedPartitions).GetPartitionById(*v.IdMountedAndLogued)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "CHMOD: No hay un sistema de archivos encontrado."
 		return nil
@@ -1812,7 +1842,7 @@ func (v *Visitor) VisitRECOVERY(ctx *parser.RECOVERYContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(id)
+	part := (*v.ListMountedPartitions).GetPartitionById(id)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "RECOVERY: No hay un sistema de archivos encontrado."
 		return nil
@@ -1854,7 +1884,7 @@ func (v *Visitor) VisitLOSS(ctx *parser.LOSSContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(id)
+	part := (*v.ListMountedPartitions).GetPartitionById(id)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "LOSS: No hay un sistema de archivos encontrado."
 		return nil
@@ -1896,7 +1926,7 @@ func (v *Visitor) VisitJOURNALING(ctx *parser.JOURNALINGContext) interface{} {
 		return nil
 	}
 
-	part := v.ListMountedPartitions.GetPartitionById(id)
+	part := (*v.ListMountedPartitions).GetPartitionById(id)
 	if part == nil || part.FileSystem == nil {
 		v.Errors += "JOURNALING: No hay un sistema de archivos encontrado."
 		return nil
@@ -2004,7 +2034,7 @@ func (v *Visitor) VisitREP(ctx *parser.REPContext) interface{} {
 	}
 
 	// --- Validar partición montada ---
-	partition := v.ListMountedPartitions.GetPartitionById(id)
+	partition := (*v.ListMountedPartitions).GetPartitionById(id)
 	if partition == nil {
 		v.Errors += fmt.Sprintf("REP: No se encontró ninguna partición montada para el ID '%s'.\n", id)
 		return nil

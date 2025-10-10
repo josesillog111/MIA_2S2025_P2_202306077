@@ -847,6 +847,66 @@ func (e *EXT2) Mkdir(virtualPath string, p bool) error {
 	return nil
 }
 
+func (e *EXT2) List(virtualPath string) ([]map[string]interface{}, error) {
+	if !e.isLogged() {
+		return nil, fmt.Errorf("List: No hay ningún usuario logueado")
+	}
+
+	// Normalizar la ruta (evita dobles / y limpia . y ..)
+	virtualPath = path.Clean("/" + strings.Trim(virtualPath, "/"))
+
+	// Resolver el path (obtiene inodo padre y nombre del directorio)
+	parentID, name, err := e.DirectoryManager.ResolvePath(virtualPath)
+	if err != nil {
+		return nil, fmt.Errorf("List: no se pudo resolver la ruta '%s': %v", virtualPath, err)
+	}
+
+	// Determinar el inodo del directorio destino
+	dirID := parentID
+	if name != "" && name != "/" {
+		dirID, err = e.DirectoryManager.FindEntry(parentID, name)
+		if err != nil {
+			return nil, fmt.Errorf("List: el directorio '%s' no existe", virtualPath)
+		}
+	}
+
+	// Leer las entradas del directorio
+	entries, err := e.DirectoryManager.ReadDirectory(dirID)
+	if err != nil {
+		return nil, fmt.Errorf("List: error leyendo el directorio '%s': %v", virtualPath, err)
+	}
+
+	// Construir resultado
+	var result []map[string]interface{}
+
+	for _, entry := range entries {
+		entryName := strings.Trim(string(entry.B_name[:]), "\x00")
+
+		// Leer el inodo del elemento
+		inode, err := e.InodeManager.ReadInode(entry.B_inodo)
+		if err != nil {
+			return nil, fmt.Errorf("List: error leyendo inodo de '%s': %v", entryName, err)
+		}
+
+		// Determinar tipo
+		entryType := "file"
+		if inode.I_type == DIR_TYPE {
+			entryType = "dir"
+		}
+
+		result = append(result, map[string]interface{}{
+			"name":  entryName,
+			"type":  entryType,
+			"size":  inode.I_size,
+			"owner": inode.I_uid,
+			"perm":  fmt.Sprintf("%03o", inode.I_permissions),
+			"time":  inode.I_mtime,
+		})
+	}
+
+	return result, nil
+}
+
 func (e *EXT2) Remove(path string) error {
 	return nil
 }
@@ -875,7 +935,7 @@ func (e *EXT2) Chown(path string, user string, recursive bool) error {
 	return nil
 }
 
-func (e *EXT2) Chmod(path string, ugo int64, recursive bool) error {
+func (e *EXT2) Chmod(path string, ugo uint16, recursive bool) error {
 	return nil
 }
 
