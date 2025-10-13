@@ -1,0 +1,16 @@
+{
+ "disks": [
+  {
+   "name": "my_disk.mia",
+   "path": "/home/jose06/Escritorio/disk_type_mia/my_disk.mia",
+   "size": 5242880,
+   "date": "2025-10-11 23:44:24"
+  },
+  {
+   "name": "Disco1.mia",
+   "path": "/home/jose06/Calificacion_MIA/Discos/Disco1.mia",
+   "size": 52428800,
+   "date": "2025-10-12 00:58:48"
+  }
+ ]
+}

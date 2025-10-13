@@ -655,10 +655,19 @@ func (v *Visitor) VisitUNMOUNT(ctx *parser.UNMOUNTContext) interface{} {
 		return nil
 	}
 	// Desmontar la partición
-	if err := v.DiskManager.Unmount(**v.ListMountedPartitions, id); err != nil {
+	list, err := v.DiskManager.Unmount(**v.ListMountedPartitions, id)
+	if err != nil {
 		v.Errors += fmt.Sprintf("UNMOUNT: Error al desmontar la partición con ID %s: %v", id, err)
 		return nil
 	}
+
+	*v.ListMountedPartitions = &list
+
+	// Si la partición desmontada es la del usuario logueado, limpiar el ID
+	if v.IdMountedAndLogued != nil && *v.IdMountedAndLogued == id {
+		*v.IdMountedAndLogued = ""
+	}
+
 	v.Console += fmt.Sprintf("UNMOUNT: La partición con ID %s ha sido desmontada correctamente.\n", id)
 	return nil
 

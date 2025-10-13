@@ -4,9 +4,9 @@ import (
 	dmanager "backend/disk_manager"
 	parser "backend/parser"
 	util "backend/util"
+	"io"
 
 	"encoding/json"
-	"io"
 	"net/http"
 
 	"fmt"
@@ -29,13 +29,16 @@ func main() {
 
 	// Configura el manejador para la ruta /execute
 	http.HandleFunc("/execute", handleExecute)
+	http.HandleFunc("/disk/list", requestManager.ListDisksHandler)
+	http.HandleFunc("/disk/partitions", requestManager.ListPartitionsHandler)
+	http.HandleFunc("/disk/checkfs", requestManager.CheckFSHandler)
 	http.HandleFunc("/api/fs/list", requestManager.ListHandler)
 	http.HandleFunc("/api/fs/read", requestManager.ReadHandler)
 	http.HandleFunc("/api/fs/mkdir", requestManager.MkdirHandler)
 	http.HandleFunc("/api/fs/create", requestManager.MkfileHandler)
 	http.HandleFunc("/api/fs/delete", requestManager.DeleteHandler)
 
-	fmt.Println("Servidor escuchando en http://localhost:8080/execute")
+	fmt.Println("Servidor escuchando en http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println("Error al iniciar el servidor:", err)
@@ -43,6 +46,7 @@ func main() {
 }
 
 func handleExecute(w http.ResponseWriter, r *http.Request) {
+	// ==== CORS ====
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -51,11 +55,12 @@ func handleExecute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Método no soportado. Usa POST.", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// ==== Leer cuerpo como texto plano ====
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error al leer el cuerpo", http.StatusBadRequest)
@@ -65,31 +70,33 @@ func handleExecute(w http.ResponseWriter, r *http.Request) {
 
 	code := string(body)
 
-	// Ejecutar el parser con el código recibido
-
+	// ==== Ejecutar el parser ====
 	runParser(code)
 
-	var response map[string]interface{}
-	if globalVisitor.Errors != "" {
-		response = map[string]interface{}{
-			"success": false,
-			"error":   globalVisitor.Errors,
-		}
-	} else {
-		response = map[string]interface{}{
-			"success": true,
-			"output":  globalVisitor.Console,
-		}
+	// ==== Construir respuesta ====
+	var response struct {
+		Success bool   `json:"success"`
+		Output  string `json:"output,omitempty"`
+		Error   string `json:"error,omitempty"`
 	}
 
+	if globalVisitor.Errors != "" {
+		response.Success = false
+		response.Error = globalVisitor.Errors
+	} else {
+		response.Success = true
+		response.Output = globalVisitor.Console
+	}
+
+	// ==== Enviar JSON ====
 	w.Header().Set("Content-Type", "application/json")
-	jsonResponse, _ := json.Marshal(response)
-	w.Write(jsonResponse)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error al codificar respuesta JSON", http.StatusInternalServerError)
+	}
 }
 
 func runParser(code string) {
 	input := antlr.NewInputStream(code)
-
 	lexer := parser.NewGoDiskLexer(input)
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	par := parser.NewGoDiskGrammar(tokens)

@@ -42,7 +42,7 @@ func (mp *MountedPartition) HasFileSystem() (bool, error) {
 
 	// Leer firma en los primeros bytes
 	signature := string(buf[:4]) // "EXT2"
-	if signature == "EXT2" {
+	if signature == "EXT2" || signature == "EXT3" || signature == "EXT4" {
 		return true, nil
 	}
 
@@ -103,14 +103,52 @@ func (m *MountedPartitionList) SetPartition(id string, path string, part disk.Pa
 }
 
 func (m *MountedPartitionList) UnsetPartition(id string) error {
+	var removedPath string
+	var removedLetter byte
+
+	// Buscar y eliminar la partición montada
 	for i, part := range m.Partitions {
 		if part.Id == id {
-			// Eliminar la partición montada de la lista
+			removedPath = part.Path
+			// Obtener la letra del disco asociado
+			if letter, exists := diskLetters[removedPath]; exists {
+				removedLetter = letter
+			}
+			// Eliminar la partición de la lista
 			m.Partitions = append(m.Partitions[:i], m.Partitions[i+1:]...)
-			return nil
+			break
 		}
 	}
-	return fmt.Errorf("UnsetPartition: no se encontró la partición con ID %s", id)
+
+	if removedPath == "" {
+		return fmt.Errorf("UnsetPartition: no se encontró la partición con ID %s", id)
+	}
+
+	// Contar cuántas particiones quedan montadas de ese disco
+	count := 0
+	for _, part := range m.Partitions {
+		if part.Path == removedPath {
+			count++
+		}
+	}
+
+	// Si ya no quedan particiones montadas de ese disco, liberar la letra y el contador
+	if count == 0 {
+		delete(diskLetters, removedPath)
+		delete(partitionNumbers, removedPath)
+
+		// Reajustar el contador de letras si es posible (solo retrocede si era la última asignada)
+		if removedLetter+1 == nextLetter && nextLetter > 'A' {
+			nextLetter--
+		}
+	} else {
+		// Si aún hay particiones del mismo disco, solo decrementamos el número correlativo
+		if currentNum, exists := partitionNumbers[removedPath]; exists && currentNum > 1 {
+			partitionNumbers[removedPath] = currentNum - 1
+		}
+	}
+
+	return nil
 }
 
 func (m *MountedPartitionList) GetPartitionById(id string) *MountedPartition {

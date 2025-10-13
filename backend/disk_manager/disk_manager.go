@@ -5,6 +5,7 @@ import (
 	rep "backend/report_manager"
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -28,6 +29,17 @@ type DiskManager struct {
 	PartitionManager *PartitionManager
 }
 
+type DiskRecord struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Size int64  `json:"size"`
+	Date string `json:"date"`
+}
+
+type DiskRegistry struct {
+	Disks []DiskRecord `json:"disks"`
+}
+
 func NewDiskManager() *DiskManager {
 	return &DiskManager{
 		FreeSpaceManager: &FreeSpaceManager{},
@@ -35,6 +47,58 @@ func NewDiskManager() *DiskManager {
 		EbrManager:       &EbrManager{},
 		PartitionManager: &PartitionManager{},
 	}
+}
+
+func (d *DiskManager) diskRegister(nombre, path string, size int64) error {
+	regPath := "disks.json"
+	var registry DiskRegistry
+
+	// Leer el archivo si existe
+	data, err := os.ReadFile(regPath)
+	if err == nil {
+		if err := json.Unmarshal(data, &registry); err != nil {
+			fmt.Printf("diskRegister: advertencia al deserializar JSON: %v. Iniciando con registro vacío.\n", err)
+			registry.Disks = []DiskRecord{} // Aseguramos que sea una slice inicializada
+		}
+	} else if !os.IsNotExist(err) {
+		// Error diferente a "archivo no encontrado"
+		return fmt.Errorf("diskRegister: error al leer el archivo %s: %v", regPath, err)
+	}
+
+	// 1. Buscar si el disco ya existe
+	found := false
+	for i, disk := range registry.Disks {
+		if disk.Name == nombre && disk.Path == path {
+			// 2. Si existe, actualizar el registro
+			registry.Disks[i].Size = size
+			// Actualizar la fecha/hora de registro
+			registry.Disks[i].Date = time.Now().Format("2006-01-02 15:04:05")
+			found = true
+			break
+		}
+	}
+
+	// 3. Si no existe, agregar un nuevo registro
+	if !found {
+		registry.Disks = append(registry.Disks, DiskRecord{
+			Name: nombre,
+			Path: path,
+			Size: size,
+			Date: time.Now().Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	// Guardar el archivo actualizado
+	data, err = json.MarshalIndent(registry, "", " ")
+	if err != nil {
+		return fmt.Errorf("diskRegister: error al serializar JSON: %v", err)
+	}
+
+	if err := os.WriteFile(regPath, data, 0644); err != nil {
+		return fmt.Errorf("diskRegister: error al guardar el archivo: %v", err)
+	}
+
+	return nil
 }
 
 func (d *DiskManager) Mkdisk(size int64, fit string, unit string, path string) error {
@@ -98,6 +162,11 @@ func (d *DiskManager) Mkdisk(size int64, fit string, unit string, path string) e
 
 	if _, err := file.WriteAt(data, 0); err != nil {
 		return fmt.Errorf("Mkdisk: error al escribir el MBR en el disco: %v", err)
+	}
+
+	err = d.diskRegister(filepath.Base(path), path, size)
+	if err != nil {
+		return fmt.Errorf("Mkdisk: error al registrar el disco: %v", err)
 	}
 
 	return nil
@@ -478,21 +547,21 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 	return list, fmt.Errorf("Mount: error: no se encontró una partición con el nombre '%s' en el disco '%s'", name, path)
 }
 
-func (d *DiskManager) Unmount(list MountedPartitionList, id string) error {
+func (d *DiskManager) Unmount(list MountedPartitionList, id string) (MountedPartitionList, error) {
 	partition := list.GetPartitionById(id)
 	if partition == nil {
-		return fmt.Errorf("Unmount: no existe una partición montada con ID '%s'", id)
+		return MountedPartitionList{}, fmt.Errorf("Unmount: no existe una partición montada con ID '%s'", id)
 	}
 
 	err := list.UnsetPartition(id)
 	if err != nil {
-		return fmt.Errorf("Unmount: error al desmontar la partición: %v", err)
+		return MountedPartitionList{}, fmt.Errorf("Unmount: error al desmontar la partición: %v", err)
 	}
 
 	// Actualizar el MBR en disco para reflejar que la partición ya no está montada
 	mbr, err := d.MbrManager.ReadMBR(partition.Path)
 	if err != nil {
-		return fmt.Errorf("Unmount: error al leer el MBR: %v", err)
+		return MountedPartitionList{}, fmt.Errorf("Unmount: error al leer el MBR: %v", err)
 	}
 
 	for i := 0; i < 4; i++ {
@@ -507,10 +576,10 @@ func (d *DiskManager) Unmount(list MountedPartitionList, id string) error {
 
 	err = d.MbrManager.WriteMBR(&mbr, partition.Path)
 	if err != nil {
-		return fmt.Errorf("Unmount: error al actualizar el MBR en el disco: %v", err)
+		return MountedPartitionList{}, fmt.Errorf("Unmount: error al actualizar el MBR en el disco: %v", err)
 	}
 
-	return nil
+	return list, nil
 }
 
 func (d *DiskManager) Mounted(list MountedPartitionList) (string, error) {

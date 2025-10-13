@@ -12,7 +12,7 @@ type FileSystem interface {
 	Chgrp(name string, newgrp string) error
 	Mkfile(virtualPath string, recursive bool, size int64, content string) error
 	Mkdir(path string, p bool) error
-	List(virtualPath string) ([]map[string]interface{}, error)
+
 	Remove(path string) error
 	Edit(path string, contenido string) error
 	Rename(path string, name string) error
@@ -25,4 +25,8 @@ type FileSystem interface {
 	Loss() error
 	Journaling() error
 	Rep(name string, path string, path_file_ls string, format string) error
+
+	// Métodos adicionales según sea necesario
+	List(virtualPath string) ([]map[string]interface{}, error)
+	GetType() string
 }

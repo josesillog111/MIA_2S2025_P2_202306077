@@ -639,3 +639,29 @@ func (p *PartitionManager) AddLogical(path string, extended disk.Partition, part
 
 	return nil
 }
+
+func (p *PartitionManager) ListPartitions(path string) ([]disk.Partition, []disk.EBR, error) {
+	mbr, err := p.MbrManager.ReadMBR(path)
+	if err != nil {
+		return nil, nil, fmt.Errorf("ListPartitions: error al leer el MBR: %v", err)
+	}
+
+	var extendedPartition *disk.Partition
+	for i := 0; i < 4; i++ {
+		p := &mbr.Mbr_partition[i]
+		if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+			extendedPartition = p
+			break
+		}
+	}
+
+	var ebrs []disk.EBR
+	if extendedPartition != nil {
+		ebrs, err = p.EbrManager.GetEBRs(path, *extendedPartition)
+		if err != nil {
+			return nil, nil, fmt.Errorf("ListPartitions: error al cargar los EBRs: %v", err)
+		}
+	}
+
+	return mbr.Mbr_partition[:], ebrs, nil
+}

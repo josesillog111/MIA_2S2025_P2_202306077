@@ -1001,3 +1001,7 @@ func (e *EXT2) Rep(name string, path string, path_file_ls string, format string)
 
 	return fmt.Errorf("Rep: reporte '%s' no soportado", name)
 }
+
+func (e *EXT2) GetType() string {
+	return "EXT2"
+}
