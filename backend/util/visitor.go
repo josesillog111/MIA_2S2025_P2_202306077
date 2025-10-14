@@ -508,7 +508,18 @@ func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
 	// Crear partición
 	err := v.DiskManager.Fdisk(path, size, unit[0], partType[0], fit, delete, name, add)
 	if err != nil {
-		v.Errors += fmt.Sprintf("FDISK: Error al crear la partición %s: %v", name, err)
+		switch {
+		case used["delete"]:
+			v.Errors += fmt.Sprintf("FDISK: No se pudo eliminar la partición '%s' del disco %s: %s\n", name, path, err.Error())
+		case used["add"]:
+			if add > 0 {
+				v.Errors += fmt.Sprintf("FDISK: No se pudo aumentar la partición '%s' del disco %s en %d%s: %s\n", name, path, add, unit, err.Error())
+			} else {
+				v.Errors += fmt.Sprintf("FDISK: No se pudo reducir la partición '%s' del disco %s en %d%s: %s\n", name, path, -add, unit, err.Error())
+			}
+		default:
+			v.Errors += fmt.Sprintf("FDISK: No se pudo crear la partición '%s' del tipo %s en el disco %s: %s\n", name, partType, path, err.Error())
+		}
 		return nil
 	}
 
@@ -522,7 +533,19 @@ func (v *Visitor) VisitFDISK(ctx *parser.FDISKContext) interface{} {
 		message_type = "lógica"
 	}
 
-	v.Console += fmt.Sprintf("FDISK: Partición '%s' del tipo %s creada exitosamente en el disco %s\n", name, message_type, path)
+	switch {
+	case used["delete"]:
+		v.Console += fmt.Sprintf("FDISK: Partición '%s' eliminada exitosamente del disco %s\n", name, path)
+	case used["add"]:
+		if add > 0 {
+			v.Console += fmt.Sprintf("FDISK: Partición '%s' del disco %s aumentada en %d%s exitosamente\n", name, path, add, unit)
+		} else {
+			v.Console += fmt.Sprintf("FDISK: Partición '%s' del disco %s reducida en %d%s exitosamente\n", name, path, -add, unit)
+		}
+	default:
+		v.Console += fmt.Sprintf("FDISK: Partición '%s' del tipo %s creada exitosamente en el disco %s\n", name, message_type, path)
+	}
+
 	return nil
 }
 

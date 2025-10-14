@@ -192,14 +192,20 @@ const PartitionSelectionPage: React.FC<WizardPageProps> = ({ disk, onSelect, onB
 
 
     // Manejador del botón "Siguiente/Formatear"
-    const handleNext = (e: React.FormEvent) => {
+    const handleNext = async (e: React.FormEvent) => {
         e.preventDefault();
         const partition = partitions.find(p => p.id === selectedPartition);
         
         // Bloquear si no hay selección, o si la verificación está en curso o no ha terminado
         if (!partition || !onSelect || isCheckingFs || hasFs === null) return;
 
-        const partitionData = {
+        const partitionData: {
+            id: string;
+            name: string;
+            type: 'Primaria' | 'Lógica';
+            needsFormat: boolean;
+            message?: string;
+        } = {
             id: partition.id,
             name: partition.name,
             type: partition.type,
@@ -208,6 +214,33 @@ const PartitionSelectionPage: React.FC<WizardPageProps> = ({ disk, onSelect, onB
         };
 
         const URL_API = `/disk/mounted?diskPath=${encodeURIComponent(diskPath || '')}&partitionName=${encodeURIComponent(partition.name)}`;
+        try {
+            const response = await fetch(URL_API);
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            const data: {
+                message: string;
+                partitionId: string;
+            } = await response.json();
+
+            console.log(`Partición montada: ${data.partitionId}`);
+            partitionData.id = data.partitionId;
+        } catch (e: any) {
+            console.error("Error al montar la partición:", e);
+            // Continuamos aunque falle el montaje, ya que no es crítico para el flujo
+            partitionData.id = `error-${Date.now()}`;
+            partitionData.message = e.message;
+
+            // Continuamos aunque falle el montaje, ya que no es crítico para el flujo
+            partitionData.id = `error-${Date.now()}`;
+            partitionData.message = e.message;
+
+            console.error("Error al montar la partición:", e);
+            // Continuamos aunque falle el montaje, ya que no es crítico para el flujo
+            partitionData.id = `error-${Date.now()}`;
+            partitionData.message = e.message;
+        }
         
         // La función onSelect ahora decide ir a LOGIN o FORMAT_PARTITION
         onSelect(partitionData);

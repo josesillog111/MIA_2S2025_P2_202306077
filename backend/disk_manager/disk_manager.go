@@ -16,8 +16,8 @@ import (
 
 // Constantes de control de estado de partición
 const (
-	STATUS_FREE = 0
-	STATUS_USED = 1
+	STATUS_UNMOUNTED = 0
+	STATUS_MOUNTED   = 1
 )
 
 // dependencia a partition
@@ -215,7 +215,7 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 		for i := 0; i < 4; i++ {
 			p := &mbr.Mbr_partition[i]
 			existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-			if p.Part_status == STATUS_USED && existingName == name {
+			if p.Part_size > 0 && existingName == name {
 				targetPartition = p
 				break
 			}
@@ -226,7 +226,7 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 			// Buscar en lógicas si no se encontró en primarias/extendidas
 			for i := 0; i < 4; i++ {
 				p := &mbr.Mbr_partition[i]
-				if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+				if p.Part_size > 0 && p.Part_type == 'E' {
 					extendedPartition = p
 					break
 				}
@@ -239,7 +239,8 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 				for i := range ebrs {
 					e := &ebrs[i]
 					existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-					if e.Part_mount == STATUS_USED && existingName == name {
+
+					if existingName == name {
 						targetPartition = &disk.Partition{
 							Part_status: e.Part_mount,
 							Part_type:   'L',
@@ -275,7 +276,7 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 				// Buscar la extendida si no se encontró antes
 				for i := 0; i < 4; i++ {
 					p := &mbr.Mbr_partition[i]
-					if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+					if p.Part_size > 0 && p.Part_type == 'E' {
 						extendedPartition = p
 						break
 					}
@@ -345,7 +346,7 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 			fmt.Print("Respuesta inválida. Por favor ingrese 's' para sí o 'n' para no: ")
 		}
 
-		if delete != "Fast" && delete != "Full" {
+		if delete != "FAST" && delete != "FULL" {
 			return fmt.Errorf("Fdisk: el modo de borrado '%s' no es válido", delete)
 		}
 
@@ -355,7 +356,8 @@ func (d *DiskManager) Fdisk(path string, size int64, unit byte, parType byte, fi
 		for i := 0; i < 4; i++ {
 			p := &mbr.Mbr_partition[i]
 			existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-			if p.Part_status == STATUS_USED && existingName == name {
+			fmt.Println("Comparando con partición:", existingName, " y nombre partición encontrada:", strings.Trim(string(p.Part_name[:]), "\x00"))
+			if existingName == name {
 				targetIndex = i
 				targetPartition = *p
 				break
@@ -457,17 +459,18 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 				return list, fmt.Errorf("Mount: no se pueden montar particiones extendidas")
 			}
 
-			// 🔹 Generar ID aquí, ya estamos seguros que es montable
+			// Generar ID aquí, ya estamos seguros que es montable
 			id, partNum := list.GetNextId(path)
 
 			// Actualiza MBR en memoria (montado, correlativo, id)
-			p.Part_status = 1
+			p.Part_status = STATUS_MOUNTED
 			p.Part_correlative = int64(partNum)
 
 			var pid [4]byte
 			copy(pid[:], []byte(id))
 			p.Part_id = pid
 
+			// Actualizar MBR en disco
 			if err := d.MbrManager.WriteMBR(&mbr, path); err != nil {
 				return list, fmt.Errorf("Mount: error al actualizar el MBR en el disco: %v", err)
 			}
@@ -501,8 +504,8 @@ func (d *DiskManager) Mount(list MountedPartitionList, path string, name string)
 
 		for {
 			ebrName := strings.Trim(string(currentEBR.Part_name[:]), "\x00")
-			if ebrName == name {
-				currentEBR.Part_mount = 1
+			if currentEBR.Part_size > 0 && ebrName == name {
+				currentEBR.Part_mount = STATUS_MOUNTED
 
 				// Generar ID aquí
 				id, partNum := list.GetNextId(path)
@@ -567,7 +570,7 @@ func (d *DiskManager) Unmount(list MountedPartitionList, id string) (MountedPart
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
 		if bytes.Equal(p.Part_id[:], []byte(id)) {
-			p.Part_status = STATUS_FREE
+			p.Part_status = STATUS_UNMOUNTED
 			p.Part_id = [4]byte{}
 			p.Part_correlative = 0
 			break

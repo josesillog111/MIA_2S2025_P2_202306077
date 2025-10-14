@@ -3,6 +3,7 @@ package dmanager
 import (
 	disk "backend/disk_structs"
 	"encoding/binary"
+	"fmt"
 	"math"
 	"sort"
 )
@@ -14,6 +15,10 @@ type FreeSpace struct {
 	Start int64
 	End   int64
 	Size  int64
+}
+
+func (f *FreeSpace) String() string {
+	return fmt.Sprintf("Start: %d, End: %d, Size: %d bytes", f.Start, f.End, f.Size)
 }
 
 func (fsm *FreeSpaceManager) GetFreeSpaces(mbr *disk.MBR) []FreeSpace {

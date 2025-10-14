@@ -33,7 +33,7 @@ func (p *PartitionManager) CreatePrimary(name string, size int64, fit string, pa
 
 	partitionCount := 0
 	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_USED {
+		if mbr.Mbr_partition[i].Part_size > 0 { // usada
 			partitionCount++
 			if strings.Trim(string(mbr.Mbr_partition[i].Part_name[:]), "\x00") == name {
 				return fmt.Errorf("CreatePrimary: ya existe una partición con el nombre '%s'", name)
@@ -62,7 +62,7 @@ func (p *PartitionManager) CreatePrimary(name string, size int64, fit string, pa
 
 	// 3. Crear la nueva estructura de Partición
 	var newPartition disk.Partition
-	newPartition.Part_status = STATUS_USED
+	newPartition.Part_status = STATUS_UNMOUNTED
 	newPartition.Part_type = 'P'
 	newPartition.Part_fit = byte(strings.ToUpper(fit)[0])
 	newPartition.Part_start = bestFitStart
@@ -72,7 +72,7 @@ func (p *PartitionManager) CreatePrimary(name string, size int64, fit string, pa
 	// 4. Añadirla a un slot vacío en el MBR
 	added := false
 	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_FREE { // libre
+		if mbr.Mbr_partition[i].Part_size == 0 { // libre
 			mbr.Mbr_partition[i] = newPartition
 			added = true
 			break
@@ -105,22 +105,22 @@ func (p *PartitionManager) DeletePrimary(path string, partition disk.Partition, 
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
 		existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-		if p.Part_status == STATUS_USED && existingName == string(partition.Part_name[:]) {
+		if p.Part_size > 0 && existingName == strings.Trim(string(partition.Part_name[:]), "\x00") {
 			targetIndex = i
 			break
 		}
 	}
 	if targetIndex == -1 {
-		return fmt.Errorf("DeletePrimary: no se encontró una partición primaria con el nombre '%s'", string(partition.Part_name[:]))
+		return fmt.Errorf("DeletePrimary: no se encontró una partición primaria con el nombre '%s'", strings.Trim(string(partition.Part_name[:]), "\x00"))
 	}
-	if delete != "Fast" && delete != "Full" {
+	if delete != "FAST" && delete != "FULL" {
 		return fmt.Errorf("DeletePrimary: el modo de borrado '%s' no es válido", delete)
 	}
-	if delete == "Fast" {
+	if delete == "FAST" {
 		// Marcar como libre en el MBR
 		mbr.Mbr_partition[targetIndex] = disk.Partition{}
 	}
-	if delete == "Full" {
+	if delete == "FULL" {
 		// Rellenar con ceros en el disco y marcar como libre en el MBR
 		start := partition.Part_start
 		size := partition.Part_size
@@ -147,13 +147,13 @@ func (p *PartitionManager) AddPrimary(path string, partition disk.Partition, add
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
 		existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-		if p.Part_status == STATUS_USED && existingName == string(partition.Part_name[:]) {
+		if p.Part_size > 0 && existingName == strings.Trim(string(partition.Part_name[:]), "\x00") {
 			targetPartition = p
 			break
 		}
 	}
 	if targetPartition == nil {
-		return fmt.Errorf("AddPrimary: no se encontró una partición primaria con el nombre '%s'", string(partition.Part_name[:]))
+		return fmt.Errorf("AddPrimary: no se encontró una partición primaria con el nombre '%s'", strings.Trim(string(partition.Part_name[:]), "\x00"))
 	}
 
 	// Calcular tamaño a agregar o quitar en bytes
@@ -171,9 +171,19 @@ func (p *PartitionManager) AddPrimary(path string, partition disk.Partition, add
 
 	// Caso de reducir tamaño
 	if delta < 0 {
-		// En caso de valor negativo, se debe reducir el tamaño
+		var deltaSeteado string
+		if (delta > 1024*1024) || (delta < -1024*1024) {
+			// Mostrar en MB
+			deltaSeteado = fmt.Sprintf("%.2fM", float64(-delta)/float64(1024*1024))
+		} else if (delta > 1024) || (delta < -1024) {
+			// Mostrar en KB
+			deltaSeteado = fmt.Sprintf("%.2fK", float64(-delta)/float64(1024))
+		} else {
+			// Mostrar en B
+			deltaSeteado = fmt.Sprintf("%dB", -delta)
+		}
 		if targetPartition.Part_size+delta <= 0 {
-			return fmt.Errorf("AddPrimary: no se puede reducir la partición '%s' a tamaño negativo o cero", string(partition.Part_name[:]))
+			return fmt.Errorf("AddPrimary: no es posible eliminar '%s' de la partición '%s'. Espacio insuficiente", deltaSeteado, strings.Trim(string(partition.Part_name[:]), "\x00"))
 		}
 		targetPartition.Part_size += delta
 		err = p.MbrManager.WriteMBR(&mbr, path)
@@ -189,13 +199,14 @@ func (p *PartitionManager) AddPrimary(path string, partition disk.Partition, add
 		freeSpaces := p.FreeSpaceManager.GetFreeSpaces(&mbr)
 		hasSpace := false
 		for _, fs := range freeSpaces {
+			fmt.Println(fs.String())
 			if fs.Start >= endOfPartition && fs.Size >= delta {
 				hasSpace = true
 				break
 			}
 		}
 		if !hasSpace {
-			return fmt.Errorf("AddPrimary: no hay espacio libre suficiente después de la partición '%s' para agregar %d bytes", string(partition.Part_name[:]), delta)
+			return fmt.Errorf("AddPrimary: no hay espacio libre suficiente después de la partición '%s' para agregar %d bytes", strings.Trim(string(partition.Part_name[:]), "\x00"), delta)
 		}
 		// Modificar el tamaño de la partición
 		targetPartition.Part_size += delta
@@ -219,7 +230,7 @@ func (p *PartitionManager) CreateExtended(name string, size int64, fit string, p
 	partitionCount := 0
 	hasExtended := false
 	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_USED {
+		if mbr.Mbr_partition[i].Part_size > 0 {
 			partitionCount++
 			if mbr.Mbr_partition[i].Part_type == 'E' {
 				hasExtended = true
@@ -256,7 +267,7 @@ func (p *PartitionManager) CreateExtended(name string, size int64, fit string, p
 	// 3. Verificar solapamiento
 	for i := 0; i < 4; i++ {
 		p := mbr.Mbr_partition[i]
-		if p.Part_status == STATUS_USED {
+		if p.Part_size > 0 { // usada
 			end := p.Part_start + p.Part_size
 			if !(bestFitStart+size <= p.Part_start || bestFitStart >= end) {
 				return fmt.Errorf("CreateExtended:la nueva partición se solapa con '%s'", string(p.Part_name[:]))
@@ -266,7 +277,7 @@ func (p *PartitionManager) CreateExtended(name string, size int64, fit string, p
 
 	// 4. Crear la partición extendida
 	var newPartition disk.Partition
-	newPartition.Part_status = STATUS_USED
+	newPartition.Part_status = STATUS_UNMOUNTED
 	newPartition.Part_type = 'E'
 	newPartition.Part_fit = byte(strings.ToUpper(fit)[0])
 	newPartition.Part_start = bestFitStart
@@ -276,7 +287,7 @@ func (p *PartitionManager) CreateExtended(name string, size int64, fit string, p
 	// 5. Guardarla en el MBR
 	added := false
 	for i := 0; i < 4; i++ {
-		if mbr.Mbr_partition[i].Part_status == STATUS_FREE {
+		if mbr.Mbr_partition[i].Part_size == 0 { // libre
 			mbr.Mbr_partition[i] = newPartition
 			added = true
 			break
@@ -294,7 +305,7 @@ func (p *PartitionManager) CreateExtended(name string, size int64, fit string, p
 
 	// 7. Inicializar primer EBR
 	var firstEBR disk.EBR
-	firstEBR.Part_mount = STATUS_FREE
+	firstEBR.Part_mount = STATUS_UNMOUNTED
 	firstEBR.Part_fit = newPartition.Part_fit
 	firstEBR.Part_start = newPartition.Part_start
 	firstEBR.Part_size = 0
@@ -321,7 +332,7 @@ func (p *PartitionManager) DeleteExtended(path string, extended disk.Partition, 
 	}
 	for _, e := range ebrs {
 		existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-		if e.Part_mount == STATUS_USED {
+		if e.Part_size > 0 { // lógica usada
 			err := p.DeleteLogical(path, extended, existingName, delete)
 			if err != nil {
 				return fmt.Errorf("DeleteExtended: error al eliminar la lógica '%s': %v", existingName, err)
@@ -336,7 +347,7 @@ func (p *PartitionManager) DeleteExtended(path string, extended disk.Partition, 
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
 		existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-		if p.Part_status == STATUS_USED && existingName == string(extended.Part_name[:]) {
+		if existingName == strings.Trim(string(extended.Part_name[:]), "\x00") {
 			targetIndex = i
 			break
 		}
@@ -344,14 +355,14 @@ func (p *PartitionManager) DeleteExtended(path string, extended disk.Partition, 
 	if targetIndex == -1 {
 		return fmt.Errorf("DeleteExtended: no se encontró una partición extendida con el nombre '%s'", string(extended.Part_name[:]))
 	}
-	if delete != "Fast" && delete != "Full" {
+	if delete != "FAST" && delete != "FULL" {
 		return fmt.Errorf("DeleteExtended: el modo de borrado '%s' no es válido", delete)
 	}
-	if delete == "Fast" {
+	if delete == "FAST" {
 		// Marcar como libre en el MBR
 		mbr.Mbr_partition[targetIndex] = disk.Partition{}
 	}
-	if delete == "Full" {
+	if delete == "FULL" {
 		// Rellenar con ceros en el disco y marcar como libre en el MBR
 		start := extended.Part_start
 		size := extended.Part_size
@@ -378,7 +389,7 @@ func (p *PartitionManager) AddExtended(path string, partition disk.Partition, ad
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
 		existingName := strings.Trim(string(p.Part_name[:]), "\x00")
-		if p.Part_status == STATUS_USED && existingName == string(partition.Part_name[:]) {
+		if p.Part_size > 0 && existingName == strings.Trim(string(partition.Part_name[:]), "\x00") {
 			targetPartition = p
 			break
 		}
@@ -449,7 +460,7 @@ func (p *PartitionManager) CreateLogical(name string, size int64, fit string, pa
 	var extendedPartition *disk.Partition
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
-		if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+		if p.Part_size > 0 && p.Part_type == 'E' {
 			extendedPartition = p
 			break
 		}
@@ -468,7 +479,7 @@ func (p *PartitionManager) CreateLogical(name string, size int64, fit string, pa
 	// 3. Validar que no exista una partición lógica con el mismo nombre
 	for _, e := range ebrs {
 		existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-		if e.Part_mount == STATUS_USED && existingName == name {
+		if e.Part_size > 0 && existingName == name {
 			return fmt.Errorf("CreateLogical: ya existe una partición lógica con el nombre '%s'", name)
 		}
 	}
@@ -494,7 +505,7 @@ func (p *PartitionManager) CreateLogical(name string, size int64, fit string, pa
 
 	// 5. Crear el nuevo EBR
 	var newEbr disk.EBR
-	newEbr.Part_mount = STATUS_USED
+	newEbr.Part_mount = STATUS_UNMOUNTED
 	newEbr.Part_fit = byte(strings.ToUpper(fit)[0])
 	newEbr.Part_start = start
 	newEbr.Part_size = size
@@ -528,7 +539,7 @@ func (p *PartitionManager) DeleteLogical(path string, extended disk.Partition, n
 	for i := range ebrs {
 		e := &ebrs[i]
 		existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-		if e.Part_mount == STATUS_USED && existingName == name {
+		if e.Part_size > 0 && existingName == name {
 			targetEBR = e
 			if i > 0 {
 				previousEBR = &ebrs[i-1]
@@ -546,7 +557,11 @@ func (p *PartitionManager) DeleteLogical(path string, extended disk.Partition, n
 	}
 
 	if delete == "Fast" {
-		targetEBR.Part_mount = STATUS_FREE
+		targetEBR.Part_mount = STATUS_UNMOUNTED
+		targetEBR.Part_size = 0
+		targetEBR.Part_next = -1
+		targetEBR.Part_name = [16]byte{}
+		targetEBR.Part_fit = 0
 	} else if delete == "Full" {
 		// Rellenar con ceros
 		start := targetEBR.Part_start
@@ -555,7 +570,7 @@ func (p *PartitionManager) DeleteLogical(path string, extended disk.Partition, n
 		if _, err := file.WriteAt(zeroBytes, start); err != nil {
 			return fmt.Errorf("DeleteLogical: error al escribir ceros en el disco: %v", err)
 		}
-		targetEBR.Part_mount = STATUS_FREE
+		targetEBR.Part_mount = STATUS_UNMOUNTED
 	}
 
 	// Reajustar el enlace con el anterior
@@ -590,7 +605,7 @@ func (p *PartitionManager) AddLogical(path string, extended disk.Partition, part
 	for i := range ebrs {
 		e := &ebrs[i]
 		existingName := strings.Trim(string(e.Part_name[:]), "\x00")
-		if e.Part_mount == STATUS_USED && existingName == name {
+		if e.Part_size > 0 && existingName == name {
 			targetEBR = e
 			break
 		}
@@ -613,8 +628,21 @@ func (p *PartitionManager) AddLogical(path string, extended disk.Partition, part
 	}
 
 	if delta < 0 {
+
+		var deltaSeteado string
+		if (delta > 1024*1024) || (delta < -1024*1024) {
+			// Mostrar en MB
+			deltaSeteado = fmt.Sprintf("%.2fM", float64(-delta)/float64(1024*1024))
+		} else if (delta > 1024) || (delta < -1024) {
+			// Mostrar en KB
+			deltaSeteado = fmt.Sprintf("%.2fK", float64(-delta)/float64(1024))
+		} else {
+			// Mostrar en B
+			deltaSeteado = fmt.Sprintf("%dB", -delta)
+		}
+
 		if targetEBR.Part_size+delta <= 0 {
-			return fmt.Errorf("AddLogical: no se puede reducir la partición '%s' a tamaño negativo o cero", name)
+			return fmt.Errorf("AddLogical: no es posible eliminar '%s' de la partición '%s'. Espacio insuficiente", deltaSeteado, strings.Trim(string(partition.Part_name[:]), "\x00"))
 		}
 		targetEBR.Part_size += delta
 		return p.EbrManager.WriteEBR(targetEBR, path, targetEBR.Part_start)
@@ -649,7 +677,7 @@ func (p *PartitionManager) ListPartitions(path string) ([]disk.Partition, []disk
 	var extendedPartition *disk.Partition
 	for i := 0; i < 4; i++ {
 		p := &mbr.Mbr_partition[i]
-		if p.Part_status == STATUS_USED && p.Part_type == 'E' {
+		if p.Part_size > 0 && p.Part_type == 'E' {
 			extendedPartition = p
 			break
 		}
